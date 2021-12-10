@@ -1,0 +1,13 @@
+[package]
+name = "market"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+solana-program = "1.8.5"
+arrayref = "0.3.6"
+safe-transmute = "0.11.0"
+bytemuck = "1.4.0"
+spl-token = "3.2.0"

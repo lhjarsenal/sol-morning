@@ -1,0 +1,651 @@
+[
+  {
+    "chainId": 101,
+    "mint": "So11111111111111111111111111111111111111112",
+    "name": "WSOL",
+    "description": "Wrapped SOL",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "solana"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E",
+    "name": "BTC",
+    "description": "Wrapped Bitcoin",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "bitcoin"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk",
+    "name": "ETH",
+    "description": "Wrapped Ethereum",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "ethereum"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "name": "USDT",
+    "description": "USDT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "tether"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4",
+    "name": "WUSDT",
+    "description": "Wrapped USDT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "tether"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "name": "USDC",
+    "description": "USDC",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "usd-coin"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW",
+    "name": "WUSDC",
+    "description": "Wrapped USDC",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "usd-coin"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "3JSf5tPeuscJGtaCp5giEiDhv51gQ4v3zWg8DGgyLfAB",
+    "name": "YFI",
+    "description": "Wrapped YFI",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "yearn-finance"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG",
+    "name": "LINK",
+    "description": "Wrapped Chainlink",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "chainlink"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "Ga2AXHpfAF6mv2ekZwcsJFqu7wB4NV331qNH7fW9Nst8",
+    "name": "XRP",
+    "description": "Wrapped XRP",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "ripple"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "AR1Mtgh7zAtxuxGd2XPovXPVjcSdY3i4rQYisNadjfKy",
+    "name": "SUSHI",
+    "description": "Wrapped SUSHI",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "sushi"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "CsZ5LZkDS7h9TDKjrbL7VAwQZ9nsRu8vJLhRYfmGaN8K",
+    "name": "ALEPH",
+    "description": "Wrapped ALEPH",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "aleph"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "SF3oTvfWzEP3DTwGSvUXRrGTvr75pdZNnBLAH9bzMuX",
+    "name": "SXP",
+    "description": "Wrapped SXP",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "swipe"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "BtZQfWqDGbk9Wf2rXEiWyQBdBY1etnUUn6zEphvVS7yN",
+    "name": "HGET",
+    "description": "Wrapped HGET",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "hedget"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "5Fu5UUgbjpUvdBveb3a1JTNirL8rXtiYeSMWvKjtUNQv",
+    "name": "CREAM",
+    "description": "Wrapped CREAM",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "cream-2"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei",
+    "name": "UBXT",
+    "description": "Wrapped UBXT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "upbots"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e",
+    "name": "HNT",
+    "description": "Wrapped HNT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "helium"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw",
+    "name": "FRONT",
+    "description": "Wrapped FRONT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "frontier-token"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF",
+    "name": "AKRO",
+    "description": "Wrapped AKRO",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "akropolis"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc",
+    "name": "HXRO",
+    "description": "Wrapped HXRO",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "hxro"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "DEhAasscXF4kEGxFgJ3bq4PpVGp5wyUxMRvn6TzGVHaw",
+    "name": "UNI",
+    "description": "Wrapped UNI",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "uniswap"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
+    "name": "SRM",
+    "description": "Serum",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "serum"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3",
+    "name": "FTT",
+    "description": "Wrapped FTT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "ftx-token"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L",
+    "name": "MSRM",
+    "description": "MegaSerum",
+    "decimal": 0,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "megaserum"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "GXMvfY2jpQctDqZ9RoU3oWPhufKiCcFEfchvYumtX7jd",
+    "name": "TOMO",
+    "description": "Wrapped TOMO",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "tomochain"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "EcqExpGNFBve2i1cMJUTR4bPXj4ZoqmDD2rTkeCcaTFX",
+    "name": "KARMA",
+    "description": "Wrapped KARMA",
+    "decimal": 4,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "karma-dao"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "EqWCKXfs3x47uVosDpTRgFniThL9Y8iCztJaapxbEaVX",
+    "name": "LUA",
+    "description": "Wrapped LUA",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "lua-token"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "GeDS162t9yGJuLEHPWXXGrb1zwkzinCgRwnT8vHYjKza",
+    "name": "MATH",
+    "description": "Wrapped MATH",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "math"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "GUohe4DJUA5FKPWo3joiPgsB7yzer7LpDmt1Vhzy3Zht",
+    "name": "KEEP",
+    "description": "Wrapped KEEP",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "keep-network"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "9F9fNTT6qwjsu4X4yWYKZpsbw5qT7o6yR2i57JF2jagy",
+    "name": "SWAG",
+    "description": "Wrapped SWAG",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "swag-finance"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp",
+    "name": "FIDA",
+    "description": "Bonfida",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "bonfida"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6",
+    "name": "KIN",
+    "description": "KIN",
+    "decimal": 5,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "kin"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "MAPS41MDahZ9QdKXhVa4dWB9RuyfV4XqhyAZ8XcYepb",
+    "name": "MAPS",
+    "description": "MAPS",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "maps"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "z3dn17yLaGMKffVogeFHQ9zWVcXgqgf3PQnDsNs2g6M",
+    "name": "OXY",
+    "description": "OXY",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "oxygen"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "name": "RAY",
+    "description": "Raydium",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "raydium"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "3K6rftdAaQYMPunrtNRHgnK2UAtjm2JwyT2oCiTDouYE",
+    "name": "xCOPE",
+    "description": "xCOPE",
+    "decimal": 0,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "cope"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "8HGyAAB1yoM1ttS7pXjHMa3dukTFGQggnFFH3hJZgzQh",
+    "name": "COPE",
+    "description": "COPE",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "cope"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT",
+    "name": "STEP",
+    "description": "STEP",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "step-finance"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "ETAtLmCmsoiEEKfNrHKJ2kYy3MoABhU6NQvpSfij5tDs",
+    "name": "MEDIA",
+    "description": "MEDIA",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "media-network"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "8PMHT4swUMtBzgHnh5U564N5sjPSiUz2cjEQzFnnP1Fo",
+    "name": "ROPE",
+    "description": "ROPE",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "rope-token"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "MERt85fc5boKw3BW1eYdxonEuJNvXbiMbs6hvheau5K",
+    "name": "MER",
+    "description": "Mercurial",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "mercurial"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "TuLipcqtGVXP9XR62wM8WWCm6a9vhLs7T1uoWBk6FDs",
+    "name": "TULIP",
+    "description": "TULIP",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "solfarm"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "4dmKkXNHdgYsXqBHCuMikNQWwVomZURhYvkkX5c4pQ7y",
+    "name": "SNY",
+    "description": "SNY",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "synthetify-token"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "SLRSSpSLUTP7okbCUBYStWCo1vUgyt775faPqz8HUMr",
+    "name": "SLRS",
+    "description": "SLRS",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "solrise-finance"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "E5rk3nmgLUuKUiS94gg4bpWwWwyjCMtddsAXkTFLtHEy",
+    "name": "WOO",
+    "description": "Wootrade Network",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "woo-network"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "BLwTnYKqf7u4qjgZrrsKeNs2EzWkMLqVCu6j8iHyrNA3",
+    "name": "BOP",
+    "description": "Boring Protocol",
+    "decimal": 8,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "boring-protocol"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+    "name": "SAMO",
+    "description": "Samoyed Coin",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "samoyedcoin"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5",
+    "name": "renBTC",
+    "description": "renBTC",
+    "decimal": 8,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "renbtc"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "ArUkYE2XDKzqy77PRRGjo4wREWwqk6RXTfM9NeqzPvjU",
+    "name": "renDOGE",
+    "description": "renDOGE",
+    "decimal": 8,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "rendoge"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "3bRTivrVsitbmCTGtqwp7hxXPsybkjn4XLNtPsHqa3zR",
+    "name": "LIKE",
+    "description": "LIKE",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "only1"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "GsNzxJfFn6zQdJGeYsupJWzUAm57Ba7335mfhWvFiE9Z",
+    "name": "DXL",
+    "description": "DXL",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "dexlab"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    "name": "mSOL",
+    "description": "Marinade staked SOL",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "msol"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS",
+    "name": "PAI",
+    "description": "Parrot",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "parrot-usd"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "PoRTjZMPXb9T7dyU7tpLEZRQj7e6ssfAE62j2oQuc6y",
+    "name": "PORT",
+    "description": "PORT",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "port-finance"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac",
+    "name": "MNGO",
+    "description": "Mango",
+    "decimal": 6,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "mango-markets"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "DubwWZNWiNGMMeeQHPnMATNj77YZPZSAz2WVR5WjLJqz",
+    "name": "CRP",
+    "description": "CRP",
+    "decimal": 9,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "cropperfinance"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+    "name": "ATLAS",
+    "description": "ATLAS",
+    "decimal": 8,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "star-atlas"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk",
+    "name": "POLIS",
+    "description": "POLIS",
+    "decimal": 8,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "star-atlas-dao"
+    }
+  },
+  {
+    "chainId": 101,
+    "mint": "CiKu4eHsVrc1eueVQeHn7qhXTcVu95gSQmBpX4utjL9z",
+    "name": "weSHIB",
+    "description": "weSHIB",
+    "decimal": 8,
+    "tags": [],
+    "extensions": {
+      "coingeckoId": "shiba-inu"
+    }
+  }
+]
