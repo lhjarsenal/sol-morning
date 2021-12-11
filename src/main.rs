@@ -3,6 +3,7 @@
 
 mod api;
 mod response;
+pub mod node_client;
 
 #[macro_use]
 extern crate rocket;
@@ -10,7 +11,13 @@ extern crate rocket_contrib;
 extern crate serde;
 extern crate anyhow;
 extern crate solana_program;
+extern crate solana_sdk;
+
 extern crate rust_decimal;
+extern crate market;
+extern crate my_client;
+extern crate bytemuck;
+
 
 use rocket_contrib::json::{Json, JsonValue};
 use rocket::response::Responder;
@@ -42,7 +49,7 @@ pub fn new_todo(todo: Json<ToDo>) -> Json<ToDo> {
 pub fn opt_swap(todo: Json<OptRequest>) -> Json<OptResponse> {
     println!("todo={:?}", todo.0);
 
-    todo.0.loadData();
+    todo.0.load_data();
     Json(OptResponse::new())
 }
 

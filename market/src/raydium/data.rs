@@ -1,66 +1,85 @@
+use crate::market::{MarketPool, MarketOptMap, MarketType};
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
 use std::fs;
 use std::collections::HashMap;
 use solana_program::pubkey::Pubkey;
 use rust_decimal::prelude::FromStr;
-use rocket_contrib::json::Json;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct OptRequest {
-    pub amount_in: f32,
-    pub quote_mint: String,
-    pub base_mint: String,
-    pub slippage: u32,
-    pub exclude: Vec<String>,
-}
-
-impl OptRequest {
-    pub fn loadData(&self) {
-
-        //查询
-        let token_main_path = "./token_mint.json".to_string();
-        let tokens_adr = load_token_data_from_file(&token_main_path).expect("load data fail");
-
-        let quote_token = tokens_adr.get(&self.quote_mint).expect("pubKey not found");
-        let base_token = tokens_adr.get(&self.base_mint).expect("pubKey not found");
-        println!("quote={},base={}", quote_token.mint.to_string(), base_token.mint.to_string());
-        println!("json={:?}",Json(tokens_adr));
-        let markets = vec!["raydium", "orca", "saber", "swap", "serum"];
-    }
-}
+const RAYDIUM_MARKET: &str = "raydium";
+const RAYDIUM_PROGRAM_ID: &str = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8";
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct RawTokenAddr {
-    pub name: String,
-    pub mint: String,
-    pub decimal: u8,
-    pub description: String,
+pub struct RawMarketPool {
+    pub id: String,
+    pub quote_mint: String,
+    pub base_mint: String,
+    pub market_quote_vault: String,
+    pub market_base_vault: String,
 }
 
-#[derive(Debug, Clone)]
-pub struct TokenAddr {
-    pub name: String,
-    pub mint: Pubkey,
-    pub decimal: u8,
-    pub description: String,
-}
+pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<MarketOptMap> {
+    let market_main_path = "./raydium_pool.json".to_string();
 
-pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenAddr>> {
-    let raw_info = fs::read_to_string(path).expect("Error read file");
-    let vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info)?;
-    let res: HashMap<String, TokenAddr> = vec
-        .iter()
-        .map(|x| {
-            let key = x.mint.clone();
-            (key, TokenAddr {
-                name: (x.name).to_string(),
-                mint: Pubkey::from_str(&x.mint).unwrap(),
-                decimal: x.decimal,
-                description: (x.description).to_string(),
-            })
-        })
-        .collect();
-    Ok(res)
+    let raw_info = fs::read_to_string(market_main_path).expect("Error read file");
+    let vec: Vec<RawMarketPool> = serde_json::from_str(&raw_info)?;
+
+    let mut quote_map = HashMap::new();
+    let mut base_map = HashMap::new();
+
+    for pool in &vec {
+        if pool.quote_mint.eq(quote_mint) {
+            let market_pool = MarketPool {
+                pool_key: Pubkey::from_str(&pool.id).unwrap(),
+                quote_mint_key: Pubkey::from_str(&pool.quote_mint).unwrap(),
+                base_mint_key: Pubkey::from_str(&pool.base_mint).unwrap(),
+                quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
+                base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
+                is_quote_to_base: true,
+            };
+            quote_map.insert(pool.base_mint.clone(), market_pool);
+        }
+        if pool.base_mint.eq(quote_mint) {
+            let market_pool = MarketPool {
+                pool_key: Pubkey::from_str(&pool.id).unwrap(),
+                quote_mint_key: Pubkey::from_str(&pool.quote_mint).unwrap(),
+                base_mint_key: Pubkey::from_str(&pool.base_mint).unwrap(),
+                quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
+                base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
+                is_quote_to_base: false,
+            };
+            quote_map.insert(pool.quote_mint.clone(), market_pool);
+        }
+        if pool.quote_mint.eq(base_mint) {
+            let market_pool = MarketPool {
+                pool_key: Pubkey::from_str(&pool.id).unwrap(),
+                quote_mint_key: Pubkey::from_str(&pool.quote_mint).unwrap(),
+                base_mint_key: Pubkey::from_str(&pool.base_mint).unwrap(),
+                quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
+                base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
+                is_quote_to_base: false,
+            };
+            base_map.insert(pool.base_mint.clone(), market_pool);
+        }
+        if pool.base_mint.eq(base_mint) {
+            let market_pool = MarketPool {
+                pool_key: Pubkey::from_str(&pool.id).unwrap(),
+                quote_mint_key: Pubkey::from_str(&pool.quote_mint).unwrap(),
+                base_mint_key: Pubkey::from_str(&pool.base_mint).unwrap(),
+                quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
+                base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
+                is_quote_to_base: true,
+            };
+            base_map.insert(pool.quote_mint.clone(), market_pool);
+        }
+    }
+
+    Ok(MarketOptMap {
+        market_type: MarketType::Raydium(RAYDIUM_MARKET.to_string().clone(), RAYDIUM_PROGRAM_ID.to_string().clone()),
+        quote_mint: quote_mint.clone(),
+        base_mint: base_mint.clone(),
+        quote_map,
+        base_map,
+    })
 }
 
