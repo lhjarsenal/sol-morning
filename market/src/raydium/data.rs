@@ -1,10 +1,11 @@
-use crate::market::{MarketPool, MarketOptMap, MarketType};
+use crate::market;
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
 use std::fs;
 use std::collections::HashMap;
 use solana_program::pubkey::Pubkey;
 use rust_decimal::prelude::FromStr;
+use market::{MarketPool, MarketOptMap, MarketType};
 
 const RAYDIUM_MARKET: &str = "raydium";
 const RAYDIUM_PROGRAM_ID: &str = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8";

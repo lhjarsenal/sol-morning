@@ -1,4 +1,5 @@
 use crate::node_client::NetworkType;
+use crate::opt_core;
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
 use std::fs;
@@ -13,21 +14,22 @@ use solana_program::{instruction::{AccountMeta, Instruction},
 };
 
 use solana_sdk::{commitment_config::CommitmentConfig,
-                 account::{Account,ReadableAccount, WritableAccount},
+                 account::{Account, ReadableAccount, WritableAccount},
                  transaction::Transaction,
                  signature::Keypair,
                  signer::Signer,
 };
 
-use my_client::{
+use solana_client::{
     client_error::Result as ClientResult,
     rpc_client::RpcClient,
     rpc_config,
     rpc_filter,
 };
-use my_client::rpc_response::RpcResult;
+use solana_client::rpc_response::RpcResult;
 
 use bytemuck::__core::borrow::BorrowMut;
+use opt_core::OptInitData;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -55,20 +57,19 @@ impl OptRequest {
         let token_main_path = "./token_mint.json".to_string();
         let tokens_adr = load_token_data_from_file(&token_main_path).expect("load token data fail");
 
+        //key不支持返回错误 todo
         let quote_token = tokens_adr.get(&self.quote_mint).expect("pubKey not found");
         let base_token = tokens_adr.get(&self.base_mint).expect("pubKey not found");
 
-        println!("quote={},base={}", quote_token.mint.to_string(), base_token.mint.to_string());
-        println!("json={:?}", Json(tokens_adr));
         let markets = vec!["raydium", "orca", "saber", "swap", "serum"];
 
         let market_pool = raydium::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load market data fail");
         println!("pool={:?}", market_pool);
 
-        let result = market_pool.filer_swap().unwrap();
+        let market_swap = market_pool.filer_swap().unwrap();
 
         let mut keys: Vec<Pubkey> = vec![];
-        for swap in &result {
+        for swap in &market_swap {
             for step in &swap.step {
                 keys.push(step.pool_key.clone());
                 keys.push(step.quote_value_key.clone());
@@ -80,19 +81,23 @@ impl OptRequest {
         let commitment_config = CommitmentConfig::processed();
         let mut accounts: Vec<Option<Account>> = client.get_multiple_accounts_with_commitment(&keys, commitment_config).unwrap().value;
 
-        println!("accounts={:?}", accounts);
         let mut account_map = HashMap::new();
         for (index, value) in accounts.iter().enumerate() {
             let pubkey = &keys[index];
             match value {
                 Some(account) => {
-                    account_map.insert(pubkey.to_string(),account);
+                    account_map.insert(pubkey.to_string(), account.clone());
                 }
                 None => {}
             }
         }
 
-        println!("result={:?}", account_map);
+        let opt_init_data = OptInitData{
+            account_map,
+            swaps:market_swap,
+        };
+
+        println!("data={:?}", opt_init_data);
     }
 }
 

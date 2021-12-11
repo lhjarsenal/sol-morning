@@ -16,14 +16,14 @@ use solana_sdk::{commitment_config::CommitmentConfig,
                  signature::Keypair,
                  signer::Signer,
 };
-use my_client::{
+use solana_client::{
     client_error::Result as ClientResult,
     rpc_client::RpcClient,
     rpc_config,
     rpc_filter,
 };
-use my_client::rpc_response::RpcResult;
-use my_client::rpc_config::RpcAccountInfoConfig;
+use solana_client::rpc_response::RpcResult;
+use solana_client::rpc_config::RpcAccountInfoConfig;
 
 
 pub struct NetworkOpts {

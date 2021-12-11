@@ -1,9 +1,10 @@
 #![feature(proc_macro_hygiene)]
 #![feature(decl_macro)]
 
-mod api;
-mod response;
+pub mod api;
+pub mod response;
 pub mod node_client;
+mod opt_core;
 
 #[macro_use]
 extern crate rocket;
@@ -15,7 +16,7 @@ extern crate solana_sdk;
 
 extern crate rust_decimal;
 extern crate market;
-extern crate my_client;
+extern crate solana_client;
 extern crate bytemuck;
 
 
