@@ -1,12 +1,13 @@
 use crate::node_client::NetworkType;
 use crate::opt_core;
+use crate::response;
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
 use std::fs;
 use std::collections::HashMap;
 use rust_decimal::prelude::FromStr;
 use rocket_contrib::json::Json;
-use market::raydium;
+use market::{raydium, saber, orca};
 use market;
 use solana_program::{program_pack::Pack, pubkey::Pubkey};
 use solana_program::{instruction::{AccountMeta, Instruction},
@@ -30,6 +31,10 @@ use solana_client::rpc_response::RpcResult;
 
 use bytemuck::__core::borrow::BorrowMut;
 use opt_core::OptInitData;
+use solana_program::account_info::AccountInfo;
+use response::{OptResponse, OptRank};
+
+use spl_token_swap::state::SwapV1;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -51,7 +56,7 @@ pub struct OptRequest {
 }
 
 impl OptRequest {
-    pub fn load_data(&self) {
+    pub fn load_data(&self) -> OptRank {
 
         //查询
         let token_main_path = "./token_mint.json".to_string();
@@ -63,10 +68,23 @@ impl OptRequest {
 
         let markets = vec!["raydium", "orca", "saber", "swap", "serum"];
 
-        let market_pool = raydium::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load market data fail");
-        println!("pool={:?}", market_pool);
+        let mut market_swap = vec![];
 
-        let market_swap = market_pool.filer_swap().unwrap();
+        let raydium_pool = raydium::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load raydium data fail");
+        let mut raydium_swap = raydium_pool.filer_swap().unwrap();
+
+        let orca_pool = orca::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
+        let mut orca_swap = orca_pool.filer_swap().unwrap();
+
+        let saber_pool = saber::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
+        let mut saber_swap = saber_pool.filer_swap().unwrap();
+
+        market_swap.append(&mut raydium_swap);
+        println!("market_swap={}",market_swap.len());
+        market_swap.append(&mut orca_swap);
+        println!("market_swap={}",market_swap.len());
+        market_swap.append(&mut saber_swap);
+        println!("market_swap={:?}",market_swap);
 
         let mut keys: Vec<Pubkey> = vec![];
         for swap in &market_swap {
@@ -79,7 +97,7 @@ impl OptRequest {
 
         let client = RpcClient::new(NetworkType::Mainnet.url().to_string());
         let commitment_config = CommitmentConfig::processed();
-        let mut accounts: Vec<Option<Account>> = client.get_multiple_accounts_with_commitment(&keys, commitment_config).unwrap().value;
+        let accounts: Vec<Option<Account>> = client.get_multiple_accounts_with_commitment(&keys, commitment_config).unwrap().value;
 
         let mut account_map = HashMap::new();
         for (index, value) in accounts.iter().enumerate() {
@@ -92,12 +110,25 @@ impl OptRequest {
             }
         }
 
-        let opt_init_data = OptInitData{
-            account_map,
-            swaps:market_swap,
-        };
+        //todo 暂时写死 50%拆单
+        let route_percent = 0.5;
+        let amount_in: f32 = self.amount_in.clone() * route_percent;
 
-        println!("data={:?}", opt_init_data);
+        let opt_init_data = OptInitData {
+            amount_in,
+            tokens_adr,
+            account_map,
+            swaps: market_swap,
+        };
+        let opt = opt_init_data.calculate().unwrap();
+
+        OptRank {
+            amount_out: self.amount_in,
+            quote_mint: self.quote_mint.to_string(),
+            base_mint: self.base_mint.to_string(),
+            slippage: self.slippage,
+            opt,
+        }
     }
 }
 
@@ -109,7 +140,7 @@ pub struct RawTokenAddr {
     pub description: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TokenAddr {
     pub name: String,
     pub mint: Pubkey,
@@ -134,4 +165,3 @@ pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenA
         .collect();
     Ok(res)
 }
-

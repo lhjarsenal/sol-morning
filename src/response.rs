@@ -1,74 +1,101 @@
 use serde::{Serialize, Deserialize};
-
+use anyhow::Result;
+use std::collections::HashMap;
+use bytemuck::__core::ops::Mul;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptResponse {
-    pub amount_out: i32,
+    pub code: u32,
+    pub msg: String,
+    pub data: Vec<OptRank>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OptRank {
+    pub amount_out: f32,
     pub quote_mint: String,
     pub base_mint: String,
     pub slippage: u32,
     pub opt: Vec<OptMarket>,
 }
 
-impl OptResponse {
-    pub fn new() -> Self {
-        OptResponse {
-            amount_out: 0,
-            quote_mint: "".to_string(),
-            base_mint: "".to_string(),
-            slippage: 0,
-            opt: vec![OptMarket::new()],
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Clone)]
 pub struct OptMarket {
     pub market: String,
     pub program_id: String,
-    pub percentage: i32,
+    pub amount_out: f32,
+    pub percentage: f32,
     pub routes: Vec<OptRoute>,
 }
 
 impl OptMarket {
-    fn new() -> Self {
-        OptMarket {
-            market: "".to_string(),
-            program_id: "".to_string(),
-            percentage: 0,
-            routes: vec![OptRoute::new()],
-        }
+    pub fn set_info(&mut self, market: String, program_id: String) {
+        self.market = market;
+        self.program_id = program_id;
+    }
+
+    pub fn get_amount(&self) -> f32 {
+        self.amount_out
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Clone)]
 pub struct OptRoute {
     //pool_key或market_key
     pub route_key: String,
 
-    pub source_amount: i32,
+    pub source_amount: f32,
     pub source_name: String,
     pub source_mint: String,
 
-    pub destination_amount: i32,
+    pub destination_amount: f32,
     pub destination_name: String,
     pub destination_mint: String,
 
 }
 
-impl OptRoute {
-    fn new() -> Self {
-        OptRoute {
-            route_key: "".to_string(),
-            source_amount: 0,
-            source_name: "".to_string(),
-            source_mint: "".to_string(),
-            destination_amount: 0,
-            destination_name: "".to_string(),
-            destination_mint: "".to_string(),
+impl OptRank {
+    pub fn opt_best(&mut self) -> Result<Vec<Self>> {
+        //按amount排序
+        self.opt.sort_by(|a, b| b.amount_out.total_cmp(&a.amount_out));
+
+        let mut opts = vec![];
+        let mut manage_opt = HashMap::new();
+
+        for opt in self.opt.iter() {
+
+            let opt_clone = opt.clone();
+
+            if !manage_opt.contains_key(&opt.market) {
+                manage_opt.insert(&opt.market, 0);
+                opts.push(opt_clone);
+            }
         }
+
+        if opts.is_empty() {
+            Ok(vec![])
+        } else if opts.len() == 1 {
+            //todo 只有一个需单独计算
+            Ok(vec![OptRank {
+                amount_out: opts[0].amount_out.mul(2.0),
+                quote_mint: self.quote_mint.to_string(),
+                base_mint: self.base_mint.to_string(),
+                slippage: self.slippage,
+                opt: opts,
+            }])
+        } else {
+            Ok(vec![OptRank {
+                amount_out: opts[0].amount_out + opts[1].amount_out,
+                quote_mint: self.quote_mint.to_string(),
+                base_mint: self.base_mint.to_string(),
+                slippage: self.slippage,
+                opt: opts,
+            }])
+        }
+
     }
 }
+
 
 
 

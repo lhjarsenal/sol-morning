@@ -1,5 +1,6 @@
 #![feature(proc_macro_hygiene)]
 #![feature(decl_macro)]
+#![feature(total_cmp)]
 
 pub mod api;
 pub mod response;
@@ -18,12 +19,15 @@ extern crate rust_decimal;
 extern crate market;
 extern crate solana_client;
 extern crate bytemuck;
+extern crate spl_token_swap;
+extern crate num_traits;
 
 
 use rocket_contrib::json::{Json, JsonValue};
 use rocket::response::Responder;
 use api::{ToDo, OptRequest};
 use response::OptResponse;
+use serde::__private::ptr::null;
 
 
 #[get("/")]
@@ -46,12 +50,30 @@ pub fn new_todo(todo: Json<ToDo>) -> Json<ToDo> {
     Json(todo.0)
 }
 
-#[post("/opt_swap", data = "<todo>")]
-pub fn opt_swap(todo: Json<OptRequest>) -> Json<OptResponse> {
-    println!("todo={:?}", todo.0);
+#[post("/opt_swap", data = "<req>")]
+pub fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
+    println!("req={:?}", req.0);
 
-    todo.0.load_data();
-    Json(OptResponse::new())
+    let mut opt_market = req.0.load_data();
+    let opt_rank = opt_market.opt_best();
+    let response;
+    match opt_rank {
+        Ok(res) => {
+            response = Json(OptResponse {
+                code: 0,
+                msg: "success".to_string(),
+                data: res,
+            });
+        }
+        Err(e) => {
+            response = Json(OptResponse {
+                code: 101,
+                msg: "error".to_string(),
+                data: vec![],
+            });
+        }
+    }
+    response
 }
 
 fn main() {
