@@ -6,6 +6,7 @@ pub mod api;
 pub mod response;
 pub mod node_client;
 mod opt_core;
+mod rpc_client;
 
 #[macro_use]
 extern crate rocket;
@@ -21,13 +22,17 @@ extern crate solana_client;
 extern crate bytemuck;
 extern crate spl_token_swap;
 extern crate num_traits;
+extern crate hyper;
+extern crate reqwest;
 
 
 use rocket_contrib::json::{Json, JsonValue};
-use rocket::response::Responder;
-use api::{ToDo, OptRequest};
+use api::{ToDo, OptRequest, TokenAddr, RawTokenAddr};
 use response::OptResponse;
-use serde::__private::ptr::null;
+use std::fs;
+use anyhow::Result;
+use rpc_client::{HistoryRequest, TxResponse};
+use hyper::Client;
 
 
 #[get("/")]
@@ -35,23 +40,33 @@ fn index() -> &'static str {
     "Hello, world!"
 }
 
-#[get("/todos")]
-pub fn todos() -> Json<Vec<ToDo>> {
-    Json(vec![ToDo {
-        id: 1,
-        title: "Read Rocket tutorial".into(),
-        description: "Read https://rocket.rs/guide/quickstart/".into(),
-        done: false,
-    }])
+#[get("/history?<address>&<before>")]
+fn history(address: String, before: Option<String>) -> Json<Vec<TxResponse>> {
+    let req = HistoryRequest {
+        address,
+        before,
+    };
+    Json(req.get_history())
 }
 
-#[post("/todos", data = "<todo>")]
-pub fn new_todo(todo: Json<ToDo>) -> Json<ToDo> {
-    Json(todo.0)
+#[get("/token_list")]
+fn token_list() -> Json<Vec<RawTokenAddr>> {
+    let token_main_path = "./token_mint.json".to_string();
+    let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
+    let vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
+    Json(vec)
+}
+
+#[get("/pool_list")]
+fn pool_list() -> Json<Vec<RawTokenAddr>> {
+    let token_main_path = "./pool.json".to_string();
+    let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
+    let vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
+    Json(vec)
 }
 
 #[post("/opt_swap", data = "<req>")]
-pub fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
+fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
     println!("req={:?}", req.0);
 
     let mut opt_market = req.0.load_data();
@@ -78,7 +93,8 @@ pub fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, todos, new_todo,opt_swap])
+        .mount("/", routes![index, opt_swap, token_list, history])
         .launch();
     print!("end")
 }
+

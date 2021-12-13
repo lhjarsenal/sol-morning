@@ -80,11 +80,11 @@ impl OptRequest {
         let mut saber_swap = saber_pool.filer_swap().unwrap();
 
         market_swap.append(&mut raydium_swap);
-        println!("market_swap={}",market_swap.len());
+        println!("market_swap={}", market_swap.len());
         market_swap.append(&mut orca_swap);
-        println!("market_swap={}",market_swap.len());
+        println!("market_swap={}", market_swap.len());
         market_swap.append(&mut saber_swap);
-        println!("market_swap={:?}",market_swap);
+        println!("market_swap={:?}", market_swap);
 
         let mut keys: Vec<Pubkey> = vec![];
         for swap in &market_swap {
@@ -134,10 +134,11 @@ impl OptRequest {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RawTokenAddr {
+    pub symbol: String,
+    pub address: String,
+    pub decimals: u8,
     pub name: String,
-    pub mint: String,
-    pub decimal: u8,
-    pub description: String,
+    pub icon_uri: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -154,12 +155,12 @@ pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenA
     let res: HashMap<String, TokenAddr> = vec
         .iter()
         .map(|x| {
-            let key = x.mint.clone();
+            let key = x.address.clone();
             (key, TokenAddr {
-                name: (x.name).to_string(),
-                mint: Pubkey::from_str(&x.mint).unwrap(),
-                decimal: x.decimal,
-                description: (x.description).to_string(),
+                name: (x.symbol).to_string(),
+                mint: Pubkey::from_str(&x.address).unwrap(),
+                decimal: x.decimals,
+                description: (x.name).to_string(),
             })
         })
         .collect();
