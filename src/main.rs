@@ -61,23 +61,13 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>) 
 
     //查询固定某一个
     match search {
-        Some(address) => {
-            for token in vec.iter() {
-                if token.address.eq(&address) {
-                    return Json(TokenListResponse {
-                        total: 1,
-                        pagesize: 1,
-                        page: 1,
-                        data: vec![token.clone()],
-                    });
-                }
-            }
-            return Json(TokenListResponse {
-                total: 0,
-                pagesize: 1,
-                page: 1,
-                data: vec![],
-            });
+        Some(symbol) => {
+            let match_symbol = symbol.trim();
+            vec = vec
+                .into_iter()
+                .filter(|x|
+                    x.symbol.to_uppercase().trim().contains(match_symbol)
+                ).collect();
         }
         None => {}
     }
