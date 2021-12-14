@@ -4,6 +4,7 @@ use anyhow::Result;
 
 use std::thread;
 use std::sync::mpsc;
+use safe_transmute::alloc::sync::Arc;
 
 const SOLSCAN_TRANSACTION_URL: &str = "https://public-api.solscan.io/account/transactions?account=";
 const SOLSCAN_DETAIL_URL: &str = "https://public-api.solscan.io/transaction/";
@@ -14,7 +15,7 @@ pub struct HistoryRequest {
     pub before: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TxResponse {
     #[serde(rename = "blockTime")]
     block_time: u64,
@@ -32,30 +33,37 @@ pub struct TxResponse {
 
 impl TxResponse {
     pub fn set_detail(&mut self, detail: Option<TxDetail>) {
-        self.detail =detail;
+        self.detail = detail;
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TxDetail {
+    #[serde(rename = "blockTime")]
     block_time: u64,
     slot: u64,
+    #[serde(rename = "txHash")]
     tx_hash: String,
     fee: u32,
     status: String,
     lamport: u64,
     signer: Vec<String>,
+    #[serde(rename = "logMessage")]
     log_message: Vec<String>,
+    #[serde(rename = "inputAccount")]
     input_account: Vec<TxInputAccount>,
+    #[serde(rename = "recentBlockhash")]
     recent_blockhash: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TxInputAccount {
     account: String,
     signer: bool,
     writable: bool,
+    #[serde(rename = "preBalance")]
     pre_balance: u64,
+    #[serde(rename = "postBalance")]
     post_balance: u64,
 }
 
@@ -74,16 +82,24 @@ impl HistoryRequest {
         let mut res = reqwest::blocking::get(transaction_url).unwrap();
         let mut tx_res = res.json::<Vec<TxResponse>>().unwrap();
 
-        // for mut tx in &tx_res {
-        //     thread::spawn(move || {
-        //         let mut detail_url: String = SOLSCAN_DETAIL_URL.to_owned() + &tx.tx_hash.clone();
-        //         let mut detail = reqwest::blocking::get(detail_url).unwrap();
-        //
-        //         // tm.send(detail.json::<TxDetail>().unwrap()).unwrap();
-        //         let tx_detail = detail.json::<TxDetail>().unwrap();
-        //         &tx.set_detail(Some(tx_detail));
-        //     });
-        // }
+        let (tx, rx) = mpsc::channel();
+
+        let arc_tx_res = Arc::new(tx_res.clone());
+
+        for i in 0..arc_tx_res.len() {
+            let tx_hash = arc_tx_res[i].tx_hash.clone();
+            let tx = tx.clone();
+            thread::spawn(move || {
+                let mut detail_url: String = SOLSCAN_DETAIL_URL.to_owned() + &*tx_hash;
+                let mut detail = reqwest::blocking::get(detail_url).unwrap();
+                let tx_detail = detail.json::<TxDetail>().unwrap();
+                tx.send((i, tx_detail));
+            });
+        }
+
+        for i in rx.recv() {
+            tx_res[i.0].set_detail(Option::from(i.1));
+        }
 
         tx_res
     }

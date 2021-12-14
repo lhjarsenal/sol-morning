@@ -24,6 +24,7 @@ extern crate spl_token_swap;
 extern crate num_traits;
 extern crate hyper;
 extern crate reqwest;
+extern crate safe_transmute;
 
 
 use rocket_contrib::json::{Json, JsonValue};
