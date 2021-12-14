@@ -51,7 +51,12 @@ impl OptInitData {
                     market_swap.set_info(x, y);
                     res.push(market_swap);
                 }
-                Saber(x, y) => {}
+                Saber(x, y) => {
+                    let mut market_swap = cal_saber(swap_amount_in, swap,
+                                                   &self.account_map, &self.tokens_adr).unwrap();
+                    market_swap.set_info(x, y);
+                    res.push(market_swap);
+                }
                 Swap(x, y) => {}
                 Serum(x, y) => {}
             }

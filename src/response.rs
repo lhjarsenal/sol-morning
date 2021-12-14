@@ -76,13 +76,14 @@ impl OptRank {
             Ok(vec![])
         } else if opts.len() == 1 {
             //todo 只有一个需单独计算
-            Ok(vec![OptRank {
+            let one_step_opt = OptRank {
                 amount_out: opts[0].amount_out.mul(2.0),
                 quote_mint: self.quote_mint.to_string(),
                 base_mint: self.base_mint.to_string(),
                 slippage: self.slippage,
                 opt: opts,
-            }])
+            };
+            Ok(vec![one_step_opt])
         } else {
             Ok(vec![OptRank {
                 amount_out: opts[0].amount_out + opts[1].amount_out,

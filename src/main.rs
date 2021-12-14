@@ -11,6 +11,7 @@ mod rpc_client;
 #[macro_use]
 extern crate rocket;
 extern crate rocket_contrib;
+extern crate rocket_cors;
 extern crate serde;
 extern crate anyhow;
 extern crate solana_program;
@@ -34,6 +35,8 @@ use std::fs;
 use anyhow::Result;
 use rpc_client::{HistoryRequest, TxResponse};
 use hyper::Client;
+use rocket::http::Method;
+use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
 
 
 #[get("/")]
@@ -95,7 +98,18 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, opt_swap, token_list, history])
+        .attach(get_cors())
         .launch();
-    print!("end")
+}
+
+fn get_cors() -> Cors {
+    let allowed_origins = AllowedOrigins::All;
+    rocket_cors::CorsOptions {
+        allowed_origins,
+        allowed_methods: vec![Method::Get, Method::Post, Method::Options].into_iter()
+            .map(From::from).collect(),
+        allowed_headers: AllowedHeaders::All,
+        ..Default::default()
+    }.to_cors().expect("cors config error")
 }
 
