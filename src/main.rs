@@ -30,7 +30,7 @@ extern crate safe_transmute;
 
 use rocket_contrib::json::{Json, JsonValue};
 use api::{ToDo, OptRequest, TokenAddr, RawTokenAddr};
-use response::OptResponse;
+use response::{OptResponse, TokenListResponse};
 use std::fs;
 use anyhow::Result;
 use rpc_client::{HistoryRequest, TxResponse};
@@ -53,12 +53,51 @@ fn history(address: String, before: Option<String>) -> Json<Vec<TxResponse>> {
     Json(req.get_history())
 }
 
-#[get("/token_list")]
-fn token_list() -> Json<Vec<RawTokenAddr>> {
+#[get("/token_list?<page>&<pagesize>")]
+fn token_list(page: Option<u32>, pagesize: Option<u32>) -> Json<TokenListResponse> {
     let token_main_path = "./token_mint.json".to_string();
     let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
-    let vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
-    Json(vec)
+    let mut vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
+
+    let mut start_page = 0;
+    let mut size = 50;
+    let mut start_index = 0;
+    let total = vec.len() as u32;
+    match page {
+        Some(p) => {
+            start_page = p - 1;
+        }
+        None => {
+            return Json(TokenListResponse{
+                total,
+                pagesize: total,
+                page: 1,
+                data: vec
+            });
+        }
+    }
+
+    match pagesize {
+        Some(s) => {
+            size = s;
+        }
+        None => {}
+    }
+
+    start_index = start_page * size;
+    let mut end_index = start_index + size;
+
+    if end_index >= total {
+        end_index = total - 1;
+    }
+
+    let res = vec[start_index as usize..end_index as usize].to_vec();
+    Json(TokenListResponse {
+        total,
+        pagesize: size,
+        page: start_page + 1,
+        data: res,
+    })
 }
 
 #[get("/pool_list")]

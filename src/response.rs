@@ -1,13 +1,23 @@
+use crate::api;
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
 use std::collections::HashMap;
 use bytemuck::__core::ops::Mul;
+use api::RawTokenAddr;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptResponse {
     pub code: u32,
     pub msg: String,
     pub data: Vec<OptRank>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenListResponse {
+    pub total: u32,
+    pub pagesize: u32,
+    pub page: u32,
+    pub data: Vec<RawTokenAddr>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -52,6 +62,10 @@ pub struct OptRoute {
     pub destination_name: String,
     pub destination_mint: String,
 
+    pub source_value: u64,
+    pub destination_value: u64,
+    pub fee_factor: f32,
+
 }
 
 impl OptRank {
@@ -63,7 +77,6 @@ impl OptRank {
         let mut manage_opt = HashMap::new();
 
         for opt in self.opt.iter() {
-
             let opt_clone = opt.clone();
 
             if !manage_opt.contains_key(&opt.market) {
@@ -75,7 +88,6 @@ impl OptRank {
         if opts.is_empty() {
             Ok(vec![])
         } else if opts.len() == 1 {
-            //todo 只有一个需单独计算
             let one_step_opt = OptRank {
                 amount_out: opts[0].amount_out.mul(2.0),
                 quote_mint: self.quote_mint.to_string(),
@@ -93,7 +105,6 @@ impl OptRank {
                 opt: opts,
             }])
         }
-
     }
 }
 

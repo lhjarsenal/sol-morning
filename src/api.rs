@@ -132,12 +132,13 @@ impl OptRequest {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RawTokenAddr {
     pub symbol: String,
     pub address: String,
     pub decimals: u8,
     pub name: String,
+    #[serde(rename = "logoURI")]
     pub icon_uri: String,
 }
 

@@ -22,7 +22,6 @@ use spl_token_swap::state::SwapV1;
 use spl_token_swap::solana_program::program_pack::Pack;
 
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptInitData {
     pub amount_in: f32,
@@ -47,13 +46,13 @@ impl OptInitData {
                 }
                 Orca(x, y) => {
                     let mut market_swap = cal_orca(swap_amount_in, swap,
-                                                      &self.account_map, &self.tokens_adr).unwrap();
+                                                   &self.account_map, &self.tokens_adr).unwrap();
                     market_swap.set_info(x, y);
                     res.push(market_swap);
                 }
                 Saber(x, y) => {
                     let mut market_swap = cal_saber(swap_amount_in, swap,
-                                                   &self.account_map, &self.tokens_adr).unwrap();
+                                                    &self.account_map, &self.tokens_adr).unwrap();
                     market_swap.set_info(x, y);
                     res.push(market_swap);
                 }
@@ -117,6 +116,9 @@ fn cal_raydium(amount_in: f32,
                 destination_amount: amount_out_format.to_f32().unwrap(),
                 destination_name: base_token.name.to_string(),
                 destination_mint: base_token.mint.to_string(),
+                source_value: quote_info.amount,
+                destination_value: base_info.amount,
+                fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -136,6 +138,9 @@ fn cal_raydium(amount_in: f32,
                 destination_amount: amount_out_format.to_f32().unwrap(),
                 destination_name: quote_token.name.to_string(),
                 destination_mint: quote_token.mint.to_string(),
+                source_value: base_info.amount,
+                destination_value: quote_info.amount,
+                fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -152,9 +157,9 @@ fn cal_raydium(amount_in: f32,
 }
 
 fn cal_orca(amount_in: f32,
-               swap: &MarketSwap,
-               account_map: &HashMap<String, Account>,
-               token_map: &HashMap<String, TokenAddr>) -> Result<OptMarket> {
+            swap: &MarketSwap,
+            account_map: &HashMap<String, Account>,
+            token_map: &HashMap<String, TokenAddr>) -> Result<OptMarket> {
     let mut res = vec![];
 
     let mut amount_in = amount_in;
@@ -185,7 +190,7 @@ fn cal_orca(amount_in: f32,
         let base_amount = Decimal::from(base_info.amount);
         if step.is_quote_to_base {
             let from_amount = Decimal::from_f32(amount_in * (quote_pow as f32)).unwrap();
-            let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_denominator)).div(Decimal::from(pool_info.fees.trade_fee_denominator));
+            let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator)).div(Decimal::from(pool_info.fees.trade_fee_denominator));
             let denominator = quote_amount.add(from_amount_with_fee);
             let amount_out = base_amount.mul(from_amount_with_fee).div(denominator);
             let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
@@ -199,6 +204,9 @@ fn cal_orca(amount_in: f32,
                 destination_amount: amount_out_format.to_f32().unwrap(),
                 destination_name: base_token.name.to_string(),
                 destination_mint: base_token.mint.to_string(),
+                source_value: quote_info.amount,
+                destination_value: base_info.amount,
+                fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -218,6 +226,9 @@ fn cal_orca(amount_in: f32,
                 destination_amount: amount_out_format.to_f32().unwrap(),
                 destination_name: quote_token.name.to_string(),
                 destination_mint: quote_token.mint.to_string(),
+                source_value: base_info.amount,
+                destination_value: quote_info.amount,
+                fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -234,9 +245,9 @@ fn cal_orca(amount_in: f32,
 }
 
 fn cal_saber(amount_in: f32,
-            swap: &MarketSwap,
-            account_map: &HashMap<String, Account>,
-            token_map: &HashMap<String, TokenAddr>) -> Result<OptMarket> {
+             swap: &MarketSwap,
+             account_map: &HashMap<String, Account>,
+             token_map: &HashMap<String, TokenAddr>) -> Result<OptMarket> {
     let mut res = vec![];
 
     let mut amount_in = amount_in;
@@ -267,7 +278,7 @@ fn cal_saber(amount_in: f32,
         let base_amount = Decimal::from(base_info.amount);
         if step.is_quote_to_base {
             let from_amount = Decimal::from_f32(amount_in * (quote_pow as f32)).unwrap();
-            let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_denominator)).div(Decimal::from(pool_info.fees.trade_fee_denominator));
+            let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator)).div(Decimal::from(pool_info.fees.trade_fee_denominator));
             let denominator = quote_amount.add(from_amount_with_fee);
             let mut amount_out = base_amount.mul(from_amount_with_fee).div(denominator);
             let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
@@ -281,6 +292,9 @@ fn cal_saber(amount_in: f32,
                 destination_amount: amount_out_format.to_f32().unwrap(),
                 destination_name: base_token.name.to_string(),
                 destination_mint: base_token.mint.to_string(),
+                source_value: quote_info.amount,
+                destination_value: base_info.amount,
+                fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -300,6 +314,9 @@ fn cal_saber(amount_in: f32,
                 destination_amount: amount_out_format.to_f32().unwrap(),
                 destination_name: quote_token.name.to_string(),
                 destination_mint: quote_token.mint.to_string(),
+                source_value: base_info.amount,
+                destination_value: quote_info.amount,
+                fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
