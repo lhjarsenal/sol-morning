@@ -15,6 +15,9 @@ pub struct RawMarketPool {
     pub account: String,
     pub quote: RawMarketToken,
     pub base: RawMarketToken,
+
+    // pub pool_mint: String,
+    // pub fee_account: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -33,6 +36,10 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
     let mut base_map = HashMap::new();
 
     for pool in &vec {
+        let mut data = HashMap::new();
+        data.insert("poolMint".to_string(), "pool_mint".to_string());
+        data.insert("feeAccount".to_string(), "fee_account".to_string());
+
         if pool.quote.mint.eq(quote_mint) {
             let market_pool = MarketPool {
                 pool_key: Pubkey::from_str(&pool.account).unwrap(),
@@ -41,6 +48,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: true,
+                data: data.clone(),
             };
             quote_map.insert(pool.base.mint.clone(), market_pool);
         }
@@ -52,6 +60,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: false,
+                data: data.clone(),
             };
             quote_map.insert(pool.quote.mint.clone(), market_pool);
         }
@@ -63,6 +72,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: false,
+                data: data.clone(),
             };
             base_map.insert(pool.base.mint.clone(), market_pool);
         }
@@ -74,6 +84,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: true,
+                data: data.clone(),
             };
             base_map.insert(pool.quote.mint.clone(), market_pool);
         }

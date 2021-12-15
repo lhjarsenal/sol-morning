@@ -4,6 +4,7 @@ use anyhow::Result;
 use std::collections::HashMap;
 use bytemuck::__core::ops::Mul;
 use api::RawTokenAddr;
+use bytemuck::__core::cmp::Ordering;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptResponse {
@@ -29,7 +30,7 @@ pub struct OptRank {
     pub opt: Vec<OptMarket>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct OptMarket {
     pub market: String,
     pub program_id: String,
@@ -49,7 +50,7 @@ impl OptMarket {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct OptRoute {
     //pool_key或market_key
     pub route_key: String,
@@ -66,12 +67,20 @@ pub struct OptRoute {
     pub destination_value: u64,
     pub fee_factor: f32,
 
+    pub data: HashMap<String, String>,
+
+}
+
+impl PartialOrd for OptMarket {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Option::from(self.amount_out.total_cmp(&other.amount_out))
+    }
 }
 
 impl OptRank {
     pub fn opt_best(&mut self) -> Result<Vec<Self>> {
         //按amount排序
-        self.opt.sort_by(|a, b| b.amount_out.total_cmp(&a.amount_out));
+        self.opt.sort_by(|a, b| b.partial_cmp(&a).unwrap());
 
         let mut opts = vec![];
         let mut manage_opt = HashMap::new();

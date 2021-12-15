@@ -61,8 +61,6 @@ impl OptInitData {
             }
         }
 
-        println!("opt_result={:?}", res);
-
         Ok(res)
     }
 }
@@ -108,6 +106,7 @@ fn cal_raydium(amount_in: f32,
             let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
             // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + 5 / 100));
             amount_out_format.rescale(base_token.decimal as u32);
+
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
                 source_amount: amount_in,
@@ -119,6 +118,7 @@ fn cal_raydium(amount_in: f32,
                 source_value: quote_info.amount,
                 destination_value: base_info.amount,
                 fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
+                data: step.data.clone(),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -141,6 +141,7 @@ fn cal_raydium(amount_in: f32,
                 source_value: base_info.amount,
                 destination_value: quote_info.amount,
                 fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
+                data: step.data.clone(),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -207,6 +208,7 @@ fn cal_orca(amount_in: f32,
                 source_value: quote_info.amount,
                 destination_value: base_info.amount,
                 fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
+                data: step.data.clone(),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -229,6 +231,7 @@ fn cal_orca(amount_in: f32,
                 source_value: base_info.amount,
                 destination_value: quote_info.amount,
                 fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
+                data: step.data.clone(),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -295,6 +298,7 @@ fn cal_saber(amount_in: f32,
                 source_value: quote_info.amount,
                 destination_value: base_info.amount,
                 fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
+                data: step.data.clone(),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();
@@ -317,6 +321,7 @@ fn cal_saber(amount_in: f32,
                 source_value: base_info.amount,
                 destination_value: quote_info.amount,
                 fee_factor: ((pool_info.fees.trade_fee_denominator - pool_info.fees.trade_fee_numerator) as f32).div(pool_info.fees.trade_fee_denominator as f32),
+                data: step.data.clone(),
             });
             amount_in = amount_out_format.to_f32().unwrap();
             to_amount = amount_in.clone();

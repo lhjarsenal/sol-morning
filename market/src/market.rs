@@ -30,6 +30,7 @@ pub struct MarketPool {
     pub quote_value_key: Pubkey,
     pub base_value_key: Pubkey,
     pub is_quote_to_base: bool,
+    pub data: HashMap<String, String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

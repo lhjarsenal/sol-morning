@@ -17,6 +17,29 @@ pub struct RawMarketPool {
     pub base_mint: String,
     pub market_quote_vault: String,
     pub market_base_vault: String,
+
+    authority: String,
+    #[serde(rename = "openOrders")]
+    open_orders: String,
+    #[serde(rename = "targetOrders")]
+    target_orders: String,
+    #[serde(rename = "baseVault")]
+    base_vault: String,
+    #[serde(rename = "quoteVault")]
+    quote_vault: String,
+    #[serde(rename = "marketProgramId")]
+    market_program_id: String,
+    #[serde(rename = "marketId")]
+    market_id: String,
+    #[serde(rename = "marketBids")]
+    market_bids: String,
+    #[serde(rename = "marketAsks")]
+    market_asks: String,
+    #[serde(rename = "marketEventQueue")]
+    market_event_queue: String,
+    #[serde(rename = "marketVaultSigner")]
+    market_vault_signer: String,
+
 }
 
 pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<MarketOptMap> {
@@ -29,6 +52,19 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
     let mut base_map = HashMap::new();
 
     for pool in &vec {
+        let mut data = HashMap::new();
+        data.insert("poolMint".to_string(), pool.authority.clone());
+        data.insert("openOrders".to_string(), pool.open_orders.clone());
+        data.insert("targetOrders".to_string(), pool.target_orders.clone());
+        data.insert("baseVault".to_string(), pool.base_vault.clone());
+        data.insert("quoteVault".to_string(), pool.quote_vault.clone());
+        data.insert("marketProgramId".to_string(), pool.market_program_id.clone());
+        data.insert("marketId".to_string(), pool.market_id.clone());
+        data.insert("marketBids".to_string(), pool.market_bids.clone());
+        data.insert("marketAsks".to_string(), pool.market_asks.clone());
+        data.insert("marketEventQueue".to_string(), pool.market_event_queue.clone());
+        data.insert("marketVaultSigner".to_string(), pool.market_vault_signer.clone());
+
         if pool.quote_mint.eq(quote_mint) {
             let market_pool = MarketPool {
                 pool_key: Pubkey::from_str(&pool.id).unwrap(),
@@ -37,6 +73,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: true,
+                data: data.clone(),
             };
             quote_map.insert(pool.base_mint.clone(), market_pool);
         }
@@ -48,6 +85,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: false,
+                data: data.clone(),
             };
             quote_map.insert(pool.quote_mint.clone(), market_pool);
         }
@@ -59,6 +97,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: false,
+                data: data.clone(),
             };
             base_map.insert(pool.base_mint.clone(), market_pool);
         }
@@ -70,6 +109,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: true,
+                data: data.clone(),
             };
             base_map.insert(pool.quote_mint.clone(), market_pool);
         }

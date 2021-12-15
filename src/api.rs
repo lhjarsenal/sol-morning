@@ -80,11 +80,8 @@ impl OptRequest {
         let mut saber_swap = saber_pool.filer_swap().unwrap();
 
         market_swap.append(&mut raydium_swap);
-        println!("market_swap={}", market_swap.len());
         market_swap.append(&mut orca_swap);
-        println!("market_swap={}", market_swap.len());
         market_swap.append(&mut saber_swap);
-        println!("market_swap={:?}", market_swap);
 
         let mut keys: Vec<Pubkey> = vec![];
         for swap in &market_swap {
