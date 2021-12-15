@@ -16,8 +16,9 @@ pub struct RawMarketPool {
     pub quote: RawMarketToken,
     pub base: RawMarketToken,
 
-    // pub pool_mint: String,
-    // pub fee_account: String,
+    pub authority: String,
+    pub pool_mint: String,
+    pub fee_account: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,8 +38,9 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
 
     for pool in &vec {
         let mut data = HashMap::new();
-        data.insert("poolMint".to_string(), "pool_mint".to_string());
-        data.insert("feeAccount".to_string(), "fee_account".to_string());
+        data.insert("authority".to_string(), pool.authority.clone());
+        data.insert("poolMint".to_string(), pool.pool_mint.clone());
+        data.insert("feeAccount".to_string(), pool.fee_account.clone());
 
         if pool.quote.mint.eq(quote_mint) {
             let market_pool = MarketPool {
