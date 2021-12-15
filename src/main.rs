@@ -172,7 +172,7 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, opt_swap, token_list, history])
+        .mount("/api", routes![index, opt_swap, token_list, history])
         .attach(get_cors())
         .launch();
 }
