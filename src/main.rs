@@ -53,13 +53,36 @@ fn history(address: String, before: Option<String>) -> Json<Vec<TxResponse>> {
     Json(req.get_history())
 }
 
-#[get("/token_list?<page>&<pagesize>&<search>")]
-fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>) -> Json<TokenListResponse> {
+#[get("/token_list?<page>&<pagesize>&<search>&<address>")]
+fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, address: Option<String>) -> Json<TokenListResponse> {
     let token_main_path = "./token_mint.json".to_string();
     let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
     let mut vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
 
-    //查询固定某一个
+    //查询固定某一个address
+    match address {
+        Some(a) => {
+            for token in vec.iter() {
+                if token.address.eq(&a) {
+                    return Json(TokenListResponse {
+                        total: 1,
+                        pagesize: 1,
+                        page: 1,
+                        data: vec![token.clone()],
+                    });
+                }
+            }
+            return Json(TokenListResponse {
+                total: 0,
+                pagesize: 1,
+                page: 1,
+                data: vec![],
+            });
+        }
+        None => {}
+    }
+
+    //模糊查询symbol
     match search {
         Some(symbol) => {
             let match_symbol = symbol.trim();
