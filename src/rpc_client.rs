@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
-use anyhow::Result;
-
 use std::thread;
 use std::sync::mpsc;
 use safe_transmute::alloc::sync::Arc;
@@ -79,7 +77,7 @@ impl HistoryRequest {
             }
             None => {}
         }
-        let mut res = reqwest::blocking::get(transaction_url).unwrap();
+        let res = reqwest::blocking::get(transaction_url).unwrap();
         let mut tx_res = res.json::<Vec<TxResponse>>().unwrap();
 
         let (tx, rx) = mpsc::channel();
@@ -90,10 +88,10 @@ impl HistoryRequest {
             let tx_hash = arc_tx_res[i].tx_hash.clone();
             let tx = tx.clone();
             thread::spawn(move || {
-                let mut detail_url: String = SOLSCAN_DETAIL_URL.to_owned() + &*tx_hash;
-                let mut detail = reqwest::blocking::get(detail_url).unwrap();
+                let detail_url: String = SOLSCAN_DETAIL_URL.to_owned() + &*tx_hash;
+                let detail = reqwest::blocking::get(detail_url).unwrap();
                 let tx_detail = detail.json::<TxDetail>().unwrap();
-                tx.send((i, tx_detail));
+                let _send_result = tx.send((i, tx_detail));
             });
         }
 

@@ -1,7 +1,6 @@
 //! State transition types
 
 use solana_program::{
-    entrypoint::ProgramResult,
     program_error::ProgramError,
     pubkey::Pubkey,
     account_info::AccountInfo,

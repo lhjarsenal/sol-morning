@@ -1,30 +1,9 @@
-use std::{
-    assert_eq,
-    borrow::Cow,
-    collections::HashMap,
-    convert::identity,
-    error::Error,
-    mem::size_of,
-    num::NonZeroU64,
-    ops::DerefMut, sync::Arc};
+use std::error::Error;
 
-use anyhow::{Result, format_err};
-use solana_program::{program_pack::Pack, pubkey::Pubkey};
-use solana_sdk::{commitment_config::CommitmentConfig,
-                 account::Account,
-                 transaction::Transaction,
-                 signature::Keypair,
-                 signer::Signer,
-};
-use solana_client::{
-    client_error::Result as ClientResult,
-    rpc_client::RpcClient,
-    rpc_config,
-    rpc_filter,
-};
-use solana_client::rpc_response::RpcResult;
-use solana_client::rpc_config::RpcAccountInfoConfig;
-
+use anyhow::Result;
+use solana_program::pubkey::Pubkey;
+use solana_sdk::{signature::Keypair, signer::Signer};
+use solana_client::{client_error::Result as ClientResult, rpc_client::RpcClient};
 
 pub struct NetworkOpts {
     url: String,
@@ -62,9 +41,9 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(network_type: NetworkType, payer: Keypair, path: &String) -> Result<Self, Box::<dyn Error>> {
+    pub fn new(network_type: NetworkType, payer: Keypair, _path: &String) -> Result<Self, Box::<dyn Error>> {
         let client = get_rpc_client(&network_type)?;
-        Ok(Client { rpc_client: client, payer})
+        Ok(Client { rpc_client: client, payer })
     }
 
     pub fn rpc(&self) -> &RpcClient {
@@ -73,8 +52,5 @@ impl Client {
     pub fn payer(&self) -> Pubkey {
         self.payer.pubkey()
     }
-
-
-
 }
 

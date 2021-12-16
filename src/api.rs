@@ -6,35 +6,13 @@ use anyhow::Result;
 use std::fs;
 use std::collections::HashMap;
 use rust_decimal::prelude::FromStr;
-use rocket_contrib::json::Json;
 use market::{raydium, saber, orca};
 use market;
-use solana_program::{program_pack::Pack, pubkey::Pubkey};
-use solana_program::{instruction::{AccountMeta, Instruction},
-                     account_info::IntoAccountInfo,
-};
-
-use solana_sdk::{commitment_config::CommitmentConfig,
-                 account::{Account, ReadableAccount, WritableAccount},
-                 transaction::Transaction,
-                 signature::Keypair,
-                 signer::Signer,
-};
-
-use solana_client::{
-    client_error::Result as ClientResult,
-    rpc_client::RpcClient,
-    rpc_config,
-    rpc_filter,
-};
-use solana_client::rpc_response::RpcResult;
-
-use bytemuck::__core::borrow::BorrowMut;
+use solana_program::pubkey::Pubkey;
+use solana_sdk::{commitment_config::CommitmentConfig, account::Account};
+use solana_client::rpc_client::RpcClient;
 use opt_core::OptInitData;
-use solana_program::account_info::AccountInfo;
-use response::{OptResponse, OptRank};
-
-use spl_token_swap::state::SwapV1;
+use response:: OptRank;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -48,7 +26,7 @@ pub struct ToDo {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptRequest {
-    pub amount_in: f32,
+    pub amount_in: f64,
     pub quote_mint: String,
     pub base_mint: String,
     pub slippage: u32,
@@ -63,10 +41,10 @@ impl OptRequest {
         let tokens_adr = load_token_data_from_file(&token_main_path).expect("load token data fail");
 
         //key不支持返回错误 todo
-        let quote_token = tokens_adr.get(&self.quote_mint).expect("pubKey not found");
-        let base_token = tokens_adr.get(&self.base_mint).expect("pubKey not found");
+        let _quote_token = tokens_adr.get(&self.quote_mint).expect("pubKey not found");
+        let _base_token = tokens_adr.get(&self.base_mint).expect("pubKey not found");
 
-        let markets = vec!["raydium", "orca", "saber", "swap", "serum"];
+        let _markets = vec!["raydium", "orca", "saber", "swap", "serum"];
 
         let mut market_swap = vec![];
 
@@ -109,7 +87,7 @@ impl OptRequest {
 
         //todo 暂时写死 50%拆单
         let route_percent = 0.5;
-        let amount_in: f32 = self.amount_in.clone() * route_percent;
+        let amount_in: f64 = self.amount_in.clone() * route_percent;
 
         let opt_init_data = OptInitData {
             amount_in,

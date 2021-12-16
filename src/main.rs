@@ -23,18 +23,15 @@ extern crate solana_client;
 extern crate bytemuck;
 extern crate spl_token_swap;
 extern crate num_traits;
-extern crate hyper;
 extern crate reqwest;
 extern crate safe_transmute;
 
 
-use rocket_contrib::json::{Json, JsonValue};
-use api::{ToDo, OptRequest, TokenAddr, RawTokenAddr};
+use rocket_contrib::json::Json;
+use api::{OptRequest, RawTokenAddr};
 use response::{OptResponse, TokenListResponse};
 use std::fs;
-use anyhow::Result;
 use rpc_client::{HistoryRequest, TxResponse};
-use hyper::Client;
 use rocket::http::Method;
 use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
 
@@ -95,9 +92,9 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, 
         None => {}
     }
 
-    let mut start_page = 0;
+    let start_page;
     let mut size = 50;
-    let mut start_index = 0;
+    let start_index;
     let total = vec.len() as u32;
     match page {
         Some(p) => {
@@ -159,7 +156,7 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
                 data: res,
             });
         }
-        Err(e) => {
+        Err(_e) => {
             response = Json(OptResponse {
                 code: 101,
                 msg: "error".to_string(),

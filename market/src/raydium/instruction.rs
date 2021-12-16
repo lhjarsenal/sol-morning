@@ -6,12 +6,10 @@ use solana_program::{
     instruction::{AccountMeta, Instruction},
     program_error::ProgramError,
     pubkey::Pubkey,
-    program_pack::Pack,
     sysvar,
 };
 use std::convert::TryInto;
 use std::mem::size_of;
-use arrayref::{array_ref};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -238,19 +236,19 @@ impl AmmInstruction {
         }
     }
 
-    fn unpack_u16(input: &[u8]) -> Result<(u16, &[u8]), ProgramError> {
-        if input.len() >= 2 {
-            let (amount, rest) = input.split_at(2);
-            let amount = amount
-                .get(..2)
-                .and_then(|slice| slice.try_into().ok())
-                .map(u16::from_le_bytes)
-                .ok_or(ProgramError::InvalidInstructionData)?;
-            Ok((amount, rest))
-        } else {
-            Err(ProgramError::InvalidInstructionData.into())
-        }
-    }
+    // fn unpack_u16(input: &[u8]) -> Result<(u16, &[u8]), ProgramError> {
+    //     if input.len() >= 2 {
+    //         let (amount, rest) = input.split_at(2);
+    //         let amount = amount
+    //             .get(..2)
+    //             .and_then(|slice| slice.try_into().ok())
+    //             .map(u16::from_le_bytes)
+    //             .ok_or(ProgramError::InvalidInstructionData)?;
+    //         Ok((amount, rest))
+    //     } else {
+    //         Err(ProgramError::InvalidInstructionData.into())
+    //     }
+    // }
 
     fn unpack_u64(input: &[u8]) -> Result<(u64, &[u8]), ProgramError> {
         if input.len() >= 8 {
