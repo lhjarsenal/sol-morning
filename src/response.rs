@@ -124,9 +124,6 @@ impl OptRank {
 
     fn cal_one_best_market_amount_out(&self, mut opt: OptMarket) -> OptRank {
 
-        //手动100%
-        opt.percentage = 1.0;
-
         let mut amount_in = opt.routes[0].source_amount * 2.0;
 
         let mut to_amount: f64 = 0.0;
@@ -165,6 +162,10 @@ impl OptRank {
                 to_amount = amount_in.clone();
             }
         };
+
+        //手动100%
+        opt.percentage = 1.0;
+        opt.amount_out = to_amount;
 
         OptRank {
             amount_out: to_amount,
