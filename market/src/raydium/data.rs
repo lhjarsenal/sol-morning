@@ -62,6 +62,8 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
         data.insert("marketId".to_string(), pool.market_id.clone());
         data.insert("marketBids".to_string(), pool.market_bids.clone());
         data.insert("marketAsks".to_string(), pool.market_asks.clone());
+        data.insert("marketBaseVault".to_string(), pool.market_base_vault.clone());
+        data.insert("marketQuoteVault".to_string(), pool.market_quote_vault.clone());
         data.insert("marketEventQueue".to_string(), pool.market_event_queue.clone());
         data.insert("marketVaultSigner".to_string(), pool.market_vault_signer.clone());
 
