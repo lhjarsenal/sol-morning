@@ -12,7 +12,7 @@ use solana_program::pubkey::Pubkey;
 use solana_sdk::{commitment_config::CommitmentConfig, account::Account};
 use solana_client::rpc_client::RpcClient;
 use opt_core::OptInitData;
-use response:: OptRank;
+use response::OptRank;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -44,22 +44,41 @@ impl OptRequest {
         let _quote_token = tokens_adr.get(&self.quote_mint).expect("pubKey not found");
         let _base_token = tokens_adr.get(&self.base_mint).expect("pubKey not found");
 
-        let _markets = vec!["raydium", "orca", "saber", "swap", "serum"];
+        let mut need_raydium = true;
+        let mut need_orca = true;
+        let mut need_saber = true;
+        let mut need_swap = true;
+        let mut need_serum = true;
+        match &self.exclude {
+            Some(a) => {
+                let exclude_markets = a.clone();
+                need_raydium = !exclude_markets.contains(&"raydium".to_string());
+                need_orca = !exclude_markets.contains(&"orca".to_string());
+                need_saber = !exclude_markets.contains(&"saber".to_string());
+                need_swap = !exclude_markets.contains(&"swap".to_string());
+                need_serum = !exclude_markets.contains(&"serum".to_string());
+            }
+            None => {}
+        }
 
         let mut market_swap = vec![];
+        if need_orca {
+            let orca_pool = orca::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
+            let mut orca_swap = orca_pool.filer_swap().unwrap();
+            market_swap.append(&mut orca_swap);
+        }
 
-        let raydium_pool = raydium::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load raydium data fail");
-        let mut raydium_swap = raydium_pool.filer_swap().unwrap();
+        if need_raydium {
+            let raydium_pool = raydium::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load raydium data fail");
+            let mut raydium_swap = raydium_pool.filer_swap().unwrap();
+            market_swap.append(&mut raydium_swap);
+        }
 
-        let orca_pool = orca::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
-        let mut orca_swap = orca_pool.filer_swap().unwrap();
-
-        let saber_pool = saber::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
-        let mut saber_swap = saber_pool.filer_swap().unwrap();
-
-        market_swap.append(&mut raydium_swap);
-        market_swap.append(&mut orca_swap);
-        market_swap.append(&mut saber_swap);
+        if need_saber {
+            let saber_pool = saber::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
+            let mut saber_swap = saber_pool.filer_swap().unwrap();
+            market_swap.append(&mut saber_swap);
+        }
 
         let mut keys: Vec<Pubkey> = vec![];
         for swap in &market_swap {
