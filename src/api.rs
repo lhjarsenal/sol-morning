@@ -113,6 +113,7 @@ impl OptRequest {
             tokens_adr,
             account_map,
             swaps: market_swap,
+            slippage: self.slippage.clone(),
         };
         let opt = opt_init_data.calculate().unwrap();
 

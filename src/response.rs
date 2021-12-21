@@ -6,6 +6,7 @@ use api::RawTokenAddr;
 use bytemuck::__core::cmp::Ordering;
 use rust_decimal::Decimal;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
+use bytemuck::__core::ops::Div;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptResponse {
@@ -123,7 +124,6 @@ impl OptRank {
     }
 
     fn cal_one_best_market_amount_out(&self, mut opt: OptMarket) -> OptRank {
-
         let mut amount_in = opt.routes[0].source_amount * 2.0;
 
         let mut to_amount: f64 = 0.0;
@@ -140,7 +140,7 @@ impl OptRank {
                 let from_amount_with_fee = from_amount * step.fee_factor;
                 let denominator = quote_amount as f64 + from_amount_with_fee;
                 let amount_out = base_amount as f64 * from_amount_with_fee / denominator;
-                let mut amount_out_format = Decimal::from_f64(amount_out / base_pow as f64).unwrap();
+                let mut amount_out_format = Decimal::from_f64(amount_out / base_pow as f64).unwrap().div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
                 // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + 5 / 100));
                 amount_out_format.rescale(step.destination_decimals as u32);
                 step.source_amount = amount_in.clone();
@@ -153,7 +153,7 @@ impl OptRank {
                 let from_amount_with_fee = from_amount * step.fee_factor;
                 let denominator = base_amount as f64 + from_amount_with_fee;
                 let amount_out = quote_amount as f64 * from_amount_with_fee / denominator;
-                let mut amount_out_format = Decimal::from_f64(amount_out / quote_pow as f64).unwrap();
+                let mut amount_out_format = Decimal::from_f64(amount_out / quote_pow as f64).unwrap().div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
                 // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + 5 / 100));
                 amount_out_format.rescale(step.source_decimals as u32);
                 step.source_amount = amount_in.clone();
