@@ -6,7 +6,10 @@ use api::RawTokenAddr;
 use bytemuck::__core::cmp::Ordering;
 use rust_decimal::Decimal;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
-use bytemuck::__core::ops::Div;
+use bytemuck::__core::ops::{Div, Sub};
+use spl_token_swap::curve::base::{SwapCurve, CurveType};
+use spl_token_swap::curve::stable::StableCurve;
+use spl_token_swap::curve::calculator::{TradeDirection, CurveCalculator};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptResponse {
@@ -70,7 +73,7 @@ pub struct OptRoute {
     pub source_value: u64,
     pub destination_value: u64,
     pub fee_factor: f64,
-
+    pub amp: Option<u64>,
     pub data: HashMap<String, String>,
 
 }
@@ -137,11 +140,39 @@ impl OptRank {
             if self.quote_mint.eq(&step.source_mint) || self.base_mint.eq(&step.destination_mint) {
                 //pc to coin
                 let from_amount = amount_in * (quote_pow as f64);
-                let from_amount_with_fee = from_amount * step.fee_factor;
-                let denominator = quote_amount as f64 + from_amount_with_fee;
-                let amount_out = base_amount as f64 * from_amount_with_fee / denominator;
-                let mut amount_out_format = Decimal::from_f64(amount_out / base_pow as f64).unwrap().div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
-                // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + 5 / 100));
+                let mut amount_out_format;
+
+                if opt.market.eq("raydium") {
+                    let from_amount_with_fee = from_amount * step.fee_factor;
+                    let denominator = quote_amount as f64 + from_amount_with_fee;
+                    let amount_out = base_amount as f64 * from_amount_with_fee / denominator;
+                    amount_out_format = Decimal::from_f64(amount_out / (base_pow as f64)).unwrap().div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
+                } else {
+                    let from_amount_with_fee = from_amount - from_amount * step.fee_factor;
+                    match step.amp {
+                        Some(amp) => {
+                            let sc = StableCurve {
+                                amp: 100
+                            };
+                            let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
+                                                                 quote_amount as u128,
+                                                                 base_amount as u128,
+                                                                 TradeDirection::AtoB).unwrap();
+                            let amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
+                            amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
+                        }
+                        None => {
+                            let sc = SwapCurve::default();
+                            let sc_result = sc.calculator.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
+                                                                            quote_amount as u128,
+                                                                            base_amount as u128,
+                                                                            TradeDirection::AtoB).unwrap();
+                            let amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
+                            amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
+                        }
+                    };
+                }
+
                 amount_out_format.rescale(step.destination_decimals as u32);
                 step.source_amount = amount_in.clone();
                 step.destination_amount = amount_out_format.to_f64().unwrap();
@@ -150,12 +181,40 @@ impl OptRank {
             } else {
                 //coin to pc
                 let from_amount = amount_in * (base_pow as f64);
-                let from_amount_with_fee = from_amount * step.fee_factor;
-                let denominator = base_amount as f64 + from_amount_with_fee;
-                let amount_out = quote_amount as f64 * from_amount_with_fee / denominator;
-                let mut amount_out_format = Decimal::from_f64(amount_out / quote_pow as f64).unwrap().div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
-                // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + 5 / 100));
-                amount_out_format.rescale(step.source_decimals as u32);
+                let mut amount_out_format;
+
+                if opt.market.eq("raydium") {
+                    let from_amount_with_fee = from_amount * step.fee_factor;
+                    let denominator = quote_amount as f64 + from_amount_with_fee;
+                    let amount_out = base_amount as f64 * from_amount_with_fee / denominator;
+                    amount_out_format = Decimal::from_f64(amount_out / (quote_pow as f64)).unwrap().div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
+                } else {
+                    let from_amount_with_fee = from_amount - from_amount * step.fee_factor;
+                    match step.amp {
+                        Some(amp) => {
+                            let sc = StableCurve {
+                                amp
+                            };
+                            let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
+                                                                 base_amount as u128,
+                                                                 quote_amount as u128,
+                                                                 TradeDirection::BtoA).unwrap();
+                            let amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
+                            amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
+                        }
+                        None => {
+                            let sc = SwapCurve::default();
+                            let sc_result = sc.calculator.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
+                                                                            base_amount as u128,
+                                                                            quote_amount as u128,
+                                                                            TradeDirection::BtoA).unwrap();
+                            let amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
+                            amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + self.slippage as f32 / 100 as f32).unwrap());
+                        }
+                    };
+                }
+
+                amount_out_format.rescale(step.destination_decimals as u32);
                 step.source_amount = amount_in.clone();
                 step.destination_amount = amount_out_format.to_f64().unwrap();
                 amount_in = amount_out_format.to_f64().unwrap();

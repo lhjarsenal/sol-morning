@@ -75,6 +75,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: true,
+                amp: None,
                 data: data.clone(),
             };
             quote_map.insert(pool.base_mint.clone(), market_pool);
@@ -87,6 +88,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: false,
+                amp: None,
                 data: data.clone(),
             };
             quote_map.insert(pool.quote_mint.clone(), market_pool);
@@ -99,6 +101,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: false,
+                amp: None,
                 data: data.clone(),
             };
             base_map.insert(pool.base_mint.clone(), market_pool);
@@ -111,6 +114,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.market_quote_vault).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.market_base_vault).unwrap(),
                 is_quote_to_base: true,
+                amp: None,
                 data: data.clone(),
             };
             base_map.insert(pool.quote_mint.clone(), market_pool);

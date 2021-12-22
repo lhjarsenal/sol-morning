@@ -19,6 +19,7 @@ pub struct RawMarketPool {
     pub authority: String,
     pub pool_mint: String,
     pub fee_account: String,
+    pub amp: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,6 +51,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: true,
+                amp: pool.amp,
                 data: data.clone(),
             };
             quote_map.insert(pool.base.mint.clone(), market_pool);
@@ -62,6 +64,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: false,
+                amp: pool.amp,
                 data: data.clone(),
             };
             quote_map.insert(pool.quote.mint.clone(), market_pool);
@@ -74,6 +77,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: false,
+                amp: pool.amp,
                 data: data.clone(),
             };
             base_map.insert(pool.base.mint.clone(), market_pool);
@@ -86,6 +90,7 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
                 quote_value_key: Pubkey::from_str(&pool.quote.reserves).unwrap(),
                 base_value_key: Pubkey::from_str(&pool.base.reserves).unwrap(),
                 is_quote_to_base: true,
+                amp: pool.amp,
                 data: data.clone(),
             };
             base_map.insert(pool.quote.mint.clone(), market_pool);

@@ -211,6 +211,7 @@
   },
   {
     "account": "F13xvvx45jVGd84ynK3c8T89UejQVxjCLtmHfPmAXAHP",
+    "amp": 100,
     "authority": "3cGHDS8uWhdxQj14vTmFtYHX3NMouPpE4o9MjQ43Bbf4",
     "pool_mint": "H2uzgruPvonVpCRhwwdukcpXK8TG17swFNzYFr2rtPxy",
     "fee_account": "B4RNxMJGRzKFQyTq2Uwkmpyjtew13n7KtdqZy6qgENTu",
@@ -393,6 +394,7 @@
   },
   {
     "account": "9EQMEzJdE2LDAY1hw1RytpufdwAXzatYfQ3M2UuT9b88",
+    "amp": 100,
     "authority": "6cwehd4xhKkJ2s7iGh4CaDb7KhMgqczSBnyNJieUYbHn",
     "pool_mint": "29cdoMgu6MS2VXpcMo1sqRdWEzdUR9tjvoh8fcK8Z87R",
     "fee_account": "6j2tt2UVYMQwqG3hRtyydW3odzBFwy3pN33tyB3xCKQ6",
@@ -435,6 +437,7 @@
   },
   {
     "account": "2q6UMko5kTnv866W9MTeAFau94pLpsdeNjDdSYSgZUXr",
+    "amp": 100,
     "authority": "Gyd77CwV23qq937x9UDa4TDkxEeQF9tp8ifotYxqW3Kd",
     "pool_mint": "APNpzQvR91v1THbsAyG3HHrUEwvexWYeNCFLQuVnxgMc",
     "fee_account": "42Xzazs9EvjtidvEDrj3JXbDtf6fpTq5XHh96mPctvBV",
@@ -1091,7 +1094,6 @@
       "reserves": "C3RzSoNiBfTNbAZMyyuV2aLfwGQRyjvkjL3pf9iuvU3R"
     }
   }
-
 ]
 
 

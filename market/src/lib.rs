@@ -7,6 +7,7 @@ extern crate rust_decimal;
 extern crate anyhow;
 extern crate spl_token;
 extern crate solana_sdk;
+extern crate uint;
 
 pub mod raydium;
 pub mod market;
