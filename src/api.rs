@@ -47,16 +47,16 @@ impl OptRequest {
         let mut need_raydium = true;
         let mut need_orca = true;
         let mut need_saber = true;
-        let mut need_swap = true;
-        let mut need_serum = true;
+        let mut _need_swap = true;
+        let mut _need_serum = true;
         match &self.exclude {
             Some(a) => {
                 let exclude_markets = a.clone();
                 need_raydium = !exclude_markets.contains(&"raydium".to_string());
                 need_orca = !exclude_markets.contains(&"orca".to_string());
                 need_saber = !exclude_markets.contains(&"saber".to_string());
-                need_swap = !exclude_markets.contains(&"swap".to_string());
-                need_serum = !exclude_markets.contains(&"serum".to_string());
+                _need_swap = !exclude_markets.contains(&"swap".to_string());
+                _need_serum = !exclude_markets.contains(&"serum".to_string());
             }
             None => {}
         }

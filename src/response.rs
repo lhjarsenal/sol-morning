@@ -6,8 +6,8 @@ use api::RawTokenAddr;
 use bytemuck::__core::cmp::Ordering;
 use rust_decimal::Decimal;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
-use bytemuck::__core::ops::{Div, Sub};
-use spl_token_swap::curve::base::{SwapCurve, CurveType};
+use bytemuck::__core::ops::Div;
+use spl_token_swap::curve::base::SwapCurve;
 use spl_token_swap::curve::stable::StableCurve;
 use spl_token_swap::curve::calculator::{TradeDirection, CurveCalculator};
 
@@ -152,7 +152,7 @@ impl OptRank {
                     match step.amp {
                         Some(amp) => {
                             let sc = StableCurve {
-                                amp: 100
+                                amp
                             };
                             let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
                                                                  quote_amount as u128,
