@@ -220,17 +220,6 @@
     }
   },
   {
-    "account": "LeekqF2NMKiFNtYD6qXJHZaHx4hUdj4UiPu4t8sz7uK",
-    "quote": {
-      "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
-      "reserves": "AiHX8hAhyNaV61cmw3AuBudUCwsYBPUyP8woTnn3Prkh"
-    },
-    "base": {
-      "mint": "So11111111111111111111111111111111111111112",
-      "reserves": "HjNF3RYWShFx6bYGevnrfKYDr7utoe4PASEzAEUHLoUW"
-    }
-  },
-  {
     "account": "BSC8REUo9LpiiWUuqMuLXs2D2yJsJfGd4HdiF3wCLxk5",
     "quote": {
       "mint": "8XSsNvaKU9FDhYWAv7Yc7qSNwuJSzVrXBNEk7AFiWF69",
@@ -646,17 +635,6 @@
     "base": {
       "mint": "JEFFSQ3s8T3wKsvp4tnRAsUBW7Cqgnf8ukBZC4C8XBm1",
       "reserves": "9YWiQh5d4jCtgMdzcGLv9bWgnLaFtzvDDh2nnhJdzhBX"
-    }
-  },
-  {
-    "account": "4Fss9Dy3vAUBuQ4SyEZz4vcLxeQqoFLZjdXhEUr3wqz3",
-    "quote": {
-      "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
-      "reserves": "6PkneD3AHPXgM35mqA3HxXCrrtUrYrF7UQfoBNXV1Ee8"
-    },
-    "base": {
-      "mint": "So11111111111111111111111111111111111111112",
-      "reserves": "4C2yZjVkyHUD3CSR9oD7BeZH4sn7mwgiH2H1rNaaTsEK"
     }
   },
   {
