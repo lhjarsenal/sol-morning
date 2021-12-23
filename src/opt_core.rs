@@ -17,16 +17,13 @@ use api::TokenAddr;
 use bytemuck::__core::ops::{Add, Mul, Div, Sub};
 use rust_decimal::prelude::{ToPrimitive, FromPrimitive};
 use solana_program::pubkey::Pubkey;
-use spl_token_swap::state::{SwapV1, SwapState};
+use spl_token_swap::state::SwapV1;
 use spl_token_swap::solana_program::program_pack::Pack;
 use spl_token_swap::curve::stable::StableCurve;
-use spl_token_swap::curve::calculator::{TradeDirection, CurveCalculator, SwapWithoutFeesResult};
-use spl_token_swap::curve::fees::Fees;
-use spl_token_swap::curve::base::{CurveType, SwapCurve};
+use spl_token_swap::curve::calculator::{TradeDirection, CurveCalculator};
+use spl_token_swap::curve::base::SwapCurve;
 use market::saber::curve::StableSwap;
-use std::time::Instant;
 use solana_program::clock::Clock;
-use solana_program::sysvar::Sysvar;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptInitData {
@@ -211,12 +208,12 @@ fn cal_orca(amount_in: f64,
 
             let from_amount_with_fee = from_amount.sub(from_amount * (fee_ratio as f64));
 
-            let mut amount_out;
+            let amount_out;
 
             match step.amp {
                 Some(amp) => {
                     let sc = StableCurve {
-                        amp: 100
+                        amp
                     };
                     let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
                                                          quote_info.amount as u128,
@@ -259,12 +256,12 @@ fn cal_orca(amount_in: f64,
 
             let from_amount_with_fee = from_amount - (from_amount * (fee_ratio as f64));
 
-            let mut amount_out;
+            let amount_out;
 
             match step.amp {
                 Some(amp) => {
                     let sc = StableCurve {
-                        amp: 100
+                        amp
                     };
                     let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
                                                          base_info.amount as u128,
