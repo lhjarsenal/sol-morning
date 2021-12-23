@@ -112,7 +112,6 @@ fn cal_raydium(amount_in: f64,
             let denominator = quote_amount.add(from_amount_with_fee);
             let amount_out = base_amount.mul(from_amount_with_fee).div(denominator);
             let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
-            // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + slippage / 100));
             amount_out_format.rescale(base_token.decimal as u32);
 
             res.push(OptRoute {
@@ -139,7 +138,6 @@ fn cal_raydium(amount_in: f64,
             let denominator = base_amount.add(from_amount_with_fee);
             let amount_out = quote_amount.mul(from_amount_with_fee).div(denominator);
             let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
-            // let mut amount_out_with_slippage = amount_out.div(Decimal::from(coin_base)).div(Decimal::from(1 + 5 / 100));
             amount_out_format.rescale(quote_token.decimal as u32);
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
@@ -360,20 +358,7 @@ fn cal_saber(amount_in: f64,
         if step.is_quote_to_base {
             let from_amount = amount_in * (quote_pow as f64);
 
-            let from_amount_with_fee = from_amount.sub(from_amount * (fee_ratio as f64));
-
-            // let sc = StableCurve {
-            //     amp: pool_info.target_amp_factor,
-            // };
-            // let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
-            //                                      quote_info.amount as u128,
-            //                                      base_info.amount as u128,
-            //                                      TradeDirection::AtoB).unwrap();
-            // let amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
-
             let sc_result = stable_swap.swap_to(from_amount as u64, quote_info.amount, base_info.amount, &pool_info.fees).unwrap();
-            println!("saber_result={:?}", sc_result);
-            println!("saber_amount_out={}", sc_result.amount_swapped);
             let amount_out = Decimal::from_u64(sc_result.amount_swapped).unwrap();
 
             let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
@@ -399,21 +384,8 @@ fn cal_saber(amount_in: f64,
         } else {
             let from_amount = amount_in * (base_pow as f64);
 
-            let from_amount_with_fee = from_amount - (from_amount * (fee_ratio as f64));
-
-            // let sc = StableCurve {
-            //     amp: pool_info.target_amp_factor,
-            // };
-            // let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
-            //                                      quote_info.amount as u128,
-            //                                      base_info.amount as u128,
-            //                                      TradeDirection::AtoB).unwrap();
-            // let amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
-
             let sc_result = stable_swap.swap_to(from_amount as u64, base_info.amount, quote_info.amount, &pool_info.fees).unwrap();
             let amount_out = Decimal::from_u64(sc_result.amount_swapped).unwrap();
-            println!("saber_result={:?}", sc_result);
-            println!("saber_amount_out={}", sc_result.amount_swapped);
             let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
             amount_out_format.rescale(quote_token.decimal as u32);
             res.push(OptRoute {
