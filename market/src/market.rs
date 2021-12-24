@@ -1,8 +1,8 @@
+
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use solana_program::pubkey::Pubkey;
 use anyhow::Result;
-
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum MarketType {
@@ -11,6 +11,28 @@ pub enum MarketType {
     Saber(String, String),
     Swap(String, String),
     Serum(String, String),
+}
+
+impl MarketType {
+    pub fn get_name(&self) -> (String, String) {
+        match self {
+            MarketType::Raydium(x, y) => {
+                (x.to_string(), y.to_string())
+            }
+            MarketType::Orca(x, y) => {
+                (x.to_string(), y.to_string())
+            }
+            MarketType::Saber(x, y) => {
+                (x.to_string(), y.to_string())
+            }
+            MarketType::Swap(x, y) => {
+                (x.to_string(), y.to_string())
+            }
+            MarketType::Serum(x, y) => {
+                (x.to_string(), y.to_string())
+            }
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

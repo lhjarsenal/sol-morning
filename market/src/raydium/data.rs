@@ -1,4 +1,5 @@
 use crate::market;
+use crate::pool;
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
 use std::fs;
@@ -6,6 +7,7 @@ use std::collections::HashMap;
 use solana_program::pubkey::Pubkey;
 use rust_decimal::prelude::FromStr;
 use market::{MarketPool, MarketOptMap, MarketType};
+use pool::PoolInfo;
 
 const RAYDIUM_MARKET: &str = "raydium";
 const RAYDIUM_PROGRAM_ID: &str = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8";
@@ -39,6 +41,8 @@ pub struct RawMarketPool {
     market_event_queue: String,
     #[serde(rename = "marketVaultSigner")]
     market_vault_signer: String,
+    #[serde(rename = "lpMint")]
+    lp_mint: String,
 
 }
 
@@ -128,5 +132,65 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
         quote_map,
         base_map,
     })
+}
+
+pub fn load_pool_from_file(lp_mint: Option<String>,
+                           quote_mint: Option<String>,
+                           base_mint: Option<String>) -> Option<PoolInfo> {
+    let pool_main_path = "./resource/pool/raydium.json".to_string();
+
+    let raw_info = fs::read_to_string(pool_main_path).expect("Error read file");
+    let vec: Vec<RawMarketPool> = serde_json::from_str(&raw_info).ok()?;
+
+    let pool_info = match lp_mint {
+        Some(lp) => {
+            //通过pool地址筛选
+            for raw_pool in vec {
+                if raw_pool.lp_mint.eq(&lp) {
+                    return Some(PoolInfo {
+                        market_type: MarketType::Raydium(RAYDIUM_MARKET.to_string(), RAYDIUM_PROGRAM_ID.to_string()),
+                        pool_key: Pubkey::from_str(&raw_pool.id).unwrap(),
+                        quote_mint_key: Pubkey::from_str(&raw_pool.quote_mint).unwrap(),
+                        base_mint_key: Pubkey::from_str(&raw_pool.base_mint).unwrap(),
+                        lp_mint_key: Pubkey::from_str(&raw_pool.lp_mint).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.market_quote_vault).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.market_base_vault).unwrap(),
+                    });
+                }
+            }
+            None
+        }
+        None => {
+            //通过 quote/base token对mint地址筛选
+            let quote_mint_address = quote_mint.unwrap().clone();
+            let base_mint_address = base_mint.unwrap().clone();
+
+            for raw_pool in vec {
+                if quote_mint_address.eq(&raw_pool.quote_mint) && base_mint_address.eq(&raw_pool.base_mint) {
+                    return Some(PoolInfo {
+                        market_type: MarketType::Raydium(RAYDIUM_MARKET.to_string(), RAYDIUM_PROGRAM_ID.to_string()),
+                        pool_key: Pubkey::from_str(&raw_pool.id).unwrap(),
+                        quote_mint_key: Pubkey::from_str(&raw_pool.quote_mint).unwrap(),
+                        base_mint_key: Pubkey::from_str(&raw_pool.base_mint).unwrap(),
+                        lp_mint_key: Pubkey::from_str(&raw_pool.lp_mint).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.market_quote_vault).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.market_base_vault).unwrap(),
+                    });
+                } else if quote_mint_address.eq(&raw_pool.base_mint) && base_mint_address.eq(&raw_pool.quote_mint) {
+                    return Some(PoolInfo {
+                        market_type: MarketType::Raydium(RAYDIUM_MARKET.to_string(), RAYDIUM_PROGRAM_ID.to_string()),
+                        pool_key: Pubkey::from_str(&raw_pool.id).unwrap(),
+                        quote_mint_key: Pubkey::from_str(&raw_pool.quote_mint).unwrap(),
+                        base_mint_key: Pubkey::from_str(&raw_pool.base_mint).unwrap(),
+                        lp_mint_key: Pubkey::from_str(&raw_pool.lp_mint).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.market_quote_vault).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.market_base_vault).unwrap(),
+                    });
+                }
+            }
+            None
+        }
+    };
+    pool_info
 }
 
