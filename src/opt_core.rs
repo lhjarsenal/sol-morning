@@ -415,7 +415,7 @@ fn cal_saber(amount_in: f64,
     })
 }
 
-fn convert_to_info<'a>(key: &'a Pubkey, account: &'a mut Account) -> AccountInfo<'a> {
+pub fn convert_to_info<'a>(key: &'a Pubkey, account: &'a mut Account) -> AccountInfo<'a> {
     AccountInfo::new(key,
                      false, false,
                      &mut account.lamports,

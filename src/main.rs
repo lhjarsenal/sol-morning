@@ -7,6 +7,7 @@ pub mod response;
 pub mod node_client;
 mod opt_core;
 mod rpc_client;
+pub mod pool;
 
 #[macro_use]
 extern crate rocket;
@@ -34,6 +35,8 @@ use std::fs;
 use rpc_client::{HistoryRequest, TxResponse};
 use rocket::http::Method;
 use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
+use pool::pool::{PoolRequest, cal_rate};
+use market::pool::PoolResponse;
 
 
 #[get("/")]
@@ -167,9 +170,59 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
     response
 }
 
+#[post("/pool_info", data = "<req>")]
+fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
+    println!("req={:?}", req.0);
+
+    let opt_pool = req.0.load_data();
+
+    let pool_info = match req.need_rate {
+        Some(bool) => {
+            if bool {
+                cal_rate(&opt_pool)
+            }else{
+                opt_pool.iter()
+                    .map(|x| -> PoolResponse{
+                        let market_type = x.market_type.get_name();
+                        PoolResponse {
+                            market: market_type.0,
+                            program_id: market_type.1,
+                            pool_account: x.pool_key.to_string(),
+                            quote_mint: x.quote_mint_key.to_string(),
+                            base_mint: x.base_mint_key.to_string(),
+                            lp_mint: x.lp_mint_key.to_string(),
+                            quote_value: x.quote_value_key.to_string(),
+                            base_value: x.base_value_key.to_string(),
+                            rate: None,
+                        }
+                    }).collect()
+            }
+        }
+        None => {
+            opt_pool.iter()
+                .map(|x| -> PoolResponse{
+                    let market_type = x.market_type.get_name();
+                    PoolResponse {
+                        market: market_type.0,
+                        program_id: market_type.1,
+                        pool_account: x.pool_key.to_string(),
+                        quote_mint: x.quote_mint_key.to_string(),
+                        base_mint: x.base_mint_key.to_string(),
+                        lp_mint: x.lp_mint_key.to_string(),
+                        quote_value: x.quote_value_key.to_string(),
+                        base_value: x.base_value_key.to_string(),
+                        rate: None,
+                    }
+                }).collect()
+        }
+    };
+
+    Json(pool_info)
+}
+
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, opt_swap, token_list, history])
+        .mount("/", routes![index, opt_swap, token_list, history, pool_info])
         .attach(get_cors())
         .launch();
 }
