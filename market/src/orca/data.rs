@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use solana_program::pubkey::Pubkey;
 use rust_decimal::prelude::FromStr;
 use market::{MarketPool, MarketOptMap, MarketType};
+use crate::pool::PoolInfo;
 
 const ORCA_MARKET: &str = "orca";
 const ORCA_PROGRAM_ID: &str = "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP";
@@ -104,5 +105,74 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
         quote_map,
         base_map,
     })
+}
+
+pub fn load_pool_from_file(lp_mint: Option<String>,
+                           quote_mint: Option<String>,
+                           base_mint: Option<String>) -> Option<PoolInfo> {
+    let pool_main_path = "./resource/pool/orca.json".to_string();
+
+    let raw_info = fs::read_to_string(pool_main_path).expect("Error read file");
+    let vec: Vec<RawMarketPool> = serde_json::from_str(&raw_info).ok()?;
+
+    let pool_info = match lp_mint {
+        Some(lp) => {
+            //通过pool地址筛选
+            for raw_pool in vec {
+                if raw_pool.pool_mint.eq(&lp) {
+                    let mut data = HashMap::new();
+                    data.insert("some_key".to_string(), "some_value".to_string());
+                    return Some(PoolInfo {
+                        market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
+                        pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
+                        quote_mint_key: Pubkey::from_str(&raw_pool.quote.mint).unwrap(),
+                        base_mint_key: Pubkey::from_str(&raw_pool.base.mint).unwrap(),
+                        lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.base.reserves).unwrap(),
+                        data
+                    });
+                }
+            }
+            None
+        }
+        None => {
+            //通过 quote/base token对mint地址筛选
+            let quote_mint_address = quote_mint.unwrap().clone();
+            let base_mint_address = base_mint.unwrap().clone();
+
+            for raw_pool in vec {
+                if quote_mint_address.eq(&raw_pool.quote.mint) && base_mint_address.eq(&raw_pool.base.mint) {
+                    let mut data = HashMap::new();
+                    data.insert("some_key".to_string(), "some_value".to_string());
+                    return Some(PoolInfo {
+                        market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
+                        pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
+                        quote_mint_key: Pubkey::from_str(&raw_pool.quote.mint).unwrap(),
+                        base_mint_key: Pubkey::from_str(&raw_pool.base.mint).unwrap(),
+                        lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
+                        data
+                    });
+                } else if quote_mint_address.eq(&raw_pool.base.mint) && base_mint_address.eq(&raw_pool.quote.mint) {
+                    let mut data = HashMap::new();
+                    data.insert("some_key".to_string(), "some_value".to_string());
+                    return Some(PoolInfo {
+                        market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
+                        pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
+                        quote_mint_key: Pubkey::from_str(&raw_pool.quote.mint).unwrap(),
+                        base_mint_key: Pubkey::from_str(&raw_pool.base.mint).unwrap(),
+                        lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.base.reserves).unwrap(),
+                        data
+                    });
+                }
+            }
+            None
+        }
+    };
+    pool_info
 }
 

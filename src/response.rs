@@ -7,6 +7,7 @@ use bytemuck::__core::cmp::Ordering;
 use rust_decimal::Decimal;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
 use bytemuck::__core::ops::Div;
+use market::pool::RawPool;
 use spl_token_swap::curve::base::SwapCurve;
 use spl_token_swap::curve::stable::StableCurve;
 use spl_token_swap::curve::calculator::{TradeDirection, CurveCalculator};
@@ -24,6 +25,14 @@ pub struct TokenListResponse {
     pub pagesize: u32,
     pub page: u32,
     pub data: Vec<RawTokenAddr>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PoolListResponse {
+    pub total: u32,
+    pub pagesize: u32,
+    pub page: u32,
+    pub data: Vec<RawPool>,
 }
 
 #[derive(Debug, Serialize, PartialEq, Deserialize)]

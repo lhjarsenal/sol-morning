@@ -1,7 +1,7 @@
 use crate::api;
 use crate::opt_core;
 use crate::node_client;
-use market::pool::{PoolInfo, PoolResponse};
+use market::pool::{PoolInfo, PoolResponse, RawPool};
 use market::{raydium};
 use serde::{Serialize, Deserialize};
 use solana_program::pubkey::Pubkey;
@@ -118,6 +118,10 @@ pub fn cal_rate(pools: &[PoolInfo]) -> Vec<PoolResponse> {
     res
 }
 
+pub fn load_pool_data(market: Option<String>) -> Vec<RawPool> {
+    RawPool::load_all_pool_data(market)
+}
+
 fn cal_raydium(account_map: &HashMap<String, Account>,
                token_map: &HashMap<String, TokenAddr>,
                pool: &PoolInfo) -> Result<PoolResponse> {
@@ -164,5 +168,6 @@ fn cal_raydium(account_map: &HashMap<String, Account>,
         quote_value: pool.quote_value_key.to_string(),
         base_value: pool.base_value_key.to_string(),
         rate: Some(amount_out_format.to_f64().unwrap()),
+        data: pool.data.clone(),
     })
 }

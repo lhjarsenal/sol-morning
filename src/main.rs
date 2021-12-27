@@ -36,7 +36,9 @@ use rpc_client::{HistoryRequest, TxResponse};
 use rocket::http::Method;
 use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
 use pool::pool::{PoolRequest, cal_rate};
-use market::pool::PoolResponse;
+use market::pool::{PoolResponse, RawPool};
+use pool::pool::load_pool_data;
+use crate::response::PoolListResponse;
 
 
 #[get("/")]
@@ -136,12 +138,85 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, 
     })
 }
 
-#[get("/pool_list")]
-fn pool_list() -> Json<Vec<RawTokenAddr>> {
-    let token_main_path = "./pool.json".to_string();
-    let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
-    let vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
-    Json(vec)
+#[get("/pool_list?<page>&<pagesize>&<lp_mint>&<address>&<market>")]
+fn pool_list(page: Option<u32>, pagesize: Option<u32>, lp_mint: Option<String>, address: Option<String>, market: Option<String>) -> Json<PoolListResponse> {
+    let mut vec: Vec<RawPool> = load_pool_data(market);
+
+    //查询固定某一个lp_mint
+    match lp_mint {
+        Some(a) => {
+            for pool in &vec {
+                if pool.lp_mint.eq(&a) {
+                    return Json(PoolListResponse {
+                        total: 1,
+                        pagesize: 1,
+                        page: 1,
+                        data: vec![pool.clone()],
+                    });
+                }
+            }
+            return Json(PoolListResponse {
+                total: 0,
+                pagesize: 1,
+                page: 1,
+                data: vec![],
+            });
+        }
+        None => {}
+    }
+
+    //固定查询某个token
+    match address {
+        Some(symbol) => {
+            let match_symbol = symbol.trim();
+            vec = vec
+                .into_iter()
+                .filter(|x|
+                    x.quote_mint.eq(match_symbol) || x.base_mint.eq(match_symbol)
+                ).collect();
+        }
+        None => {}
+    }
+
+    let start_page;
+    let mut size = 50;
+    let start_index;
+    let total = vec.len() as u32;
+    match page {
+        Some(p) => {
+            start_page = p - 1;
+        }
+        None => {
+            return Json(PoolListResponse {
+                total,
+                pagesize: total,
+                page: 1,
+                data: vec,
+            });
+        }
+    }
+
+    match pagesize {
+        Some(s) => {
+            size = s;
+        }
+        None => {}
+    }
+
+    start_index = start_page * size;
+    let mut end_index = start_index + size;
+
+    if end_index >= total {
+        end_index = total - 1;
+    }
+
+    let res = vec[start_index as usize..end_index as usize].to_vec();
+    Json(PoolListResponse {
+        total,
+        pagesize: size,
+        page: start_page + 1,
+        data: res,
+    })
 }
 
 #[post("/opt_swap", data = "<req>")]
@@ -180,7 +255,7 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
         Some(bool) => {
             if bool {
                 cal_rate(&opt_pool)
-            }else{
+            } else {
                 opt_pool.iter()
                     .map(|x| -> PoolResponse{
                         let market_type = x.market_type.get_name();
@@ -194,6 +269,7 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
                             quote_value: x.quote_value_key.to_string(),
                             base_value: x.base_value_key.to_string(),
                             rate: None,
+                            data: x.data.clone(),
                         }
                     }).collect()
             }
@@ -212,6 +288,7 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
                         quote_value: x.quote_value_key.to_string(),
                         base_value: x.base_value_key.to_string(),
                         rate: None,
+                        data: x.data.clone(),
                     }
                 }).collect()
         }
@@ -222,7 +299,7 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, opt_swap, token_list, history, pool_info])
+        .mount("/", routes![index, opt_swap, token_list,pool_list, history, pool_info])
         .attach(get_cors())
         .launch();
 }
