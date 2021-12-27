@@ -142,11 +142,17 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, 
 fn pool_list(page: Option<u32>, pagesize: Option<u32>, lp_mint: Option<String>, address: Option<String>, market: Option<String>) -> Json<PoolListResponse> {
     let mut vec: Vec<RawPool> = load_pool_data(market);
 
+    //查询
+    let token_main_path = "./token_mint.json".to_string();
+    let tokens_adr = api::load_token_data_from_file(&token_main_path).expect("load token data fail");
+
     //查询固定某一个lp_mint
     match lp_mint {
         Some(a) => {
-            for pool in &vec {
+            for mut pool in &mut vec {
                 if pool.lp_mint.eq(&a) {
+                    pool.quote_token = pool::pool::fill_token_info(&tokens_adr,&pool.quote_mint);
+                    pool.base_token = pool::pool::fill_token_info(&tokens_adr,&pool.base_mint);
                     return Json(PoolListResponse {
                         total: 1,
                         pagesize: 1,
@@ -187,6 +193,12 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>, lp_mint: Option<String>, 
             start_page = p - 1;
         }
         None => {
+
+            for mut res_info in &mut vec {
+                res_info.quote_token = pool::pool::fill_token_info(&tokens_adr, &res_info.quote_mint);
+                res_info.base_token = pool::pool::fill_token_info(&tokens_adr, &res_info.base_mint);
+            }
+
             return Json(PoolListResponse {
                 total,
                 pagesize: total,
@@ -210,7 +222,13 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>, lp_mint: Option<String>, 
         end_index = total - 1;
     }
 
-    let res = vec[start_index as usize..end_index as usize].to_vec();
+    let mut res = vec[start_index as usize..end_index as usize].to_vec();
+
+    for mut res_info in &mut res {
+        res_info.quote_token = pool::pool::fill_token_info(&tokens_adr, &res_info.quote_mint);
+        res_info.base_token = pool::pool::fill_token_info(&tokens_adr, &res_info.base_mint);
+    }
+
     Json(PoolListResponse {
         total,
         pagesize: size,

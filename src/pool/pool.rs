@@ -1,7 +1,7 @@
 use crate::api;
 use crate::opt_core;
 use crate::node_client;
-use market::pool::{PoolInfo, PoolResponse, RawPool};
+use market::pool::{PoolInfo, PoolResponse, RawPool, TokenInfo};
 use market::{raydium};
 use serde::{Serialize, Deserialize};
 use solana_program::pubkey::Pubkey;
@@ -128,6 +128,24 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse>
 
 pub fn load_pool_data(market: Option<String>) -> Vec<RawPool> {
     RawPool::load_all_pool_data(market)
+}
+
+pub fn fill_token_info(token_map: &HashMap<String, TokenAddr>, token_address: &str) -> Option<TokenInfo> {
+    let token = token_map.get(token_address);
+    let info = match token {
+        Some(a) => {
+            Some(TokenInfo {
+                symbol: a.name.to_string(),
+                address: a.mint.to_string(),
+                decimals: a.decimal.clone(),
+                name: a.description.to_string(),
+            })
+        }
+        None => {
+            None
+        }
+    };
+    info
 }
 
 fn cal_raydium(account_map: &HashMap<String, Account>,

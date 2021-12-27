@@ -39,6 +39,16 @@ pub struct RawPool {
     pub quote_mint: String,
     pub base_mint: String,
     pub lp_mint: String,
+    pub quote_token: Option<TokenInfo>,
+    pub base_token: Option<TokenInfo>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct TokenInfo {
+    pub symbol: String,
+    pub address: String,
+    pub decimals: u8,
+    pub name: String,
 }
 
 impl RawPool {
@@ -74,6 +84,8 @@ impl RawPool {
                     quote_mint: raydium.quote_mint.clone(),
                     base_mint: raydium.base_mint.clone(),
                     lp_mint: raydium.lp_mint.clone(),
+                    quote_token: None,
+                    base_token: None
                 })
             };
         }
@@ -89,6 +101,8 @@ impl RawPool {
                     quote_mint: orca.quote.mint.clone(),
                     base_mint: orca.base.mint.clone(),
                     lp_mint: orca.pool_mint.clone(),
+                    quote_token: None,
+                    base_token: None
                 })
             };
         }
