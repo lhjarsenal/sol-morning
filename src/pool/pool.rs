@@ -26,6 +26,7 @@ pub struct PoolRequest {
     pub token_mint_a: Option<String>,
     pub token_mint_b: Option<String>,
     pub lp_mint: Option<String>,
+    pub slippage: Option<u32>,
     pub need_rate: Option<bool>,
 }
 
@@ -72,7 +73,7 @@ impl PoolRequest {
     }
 }
 
-pub fn cal_rate(pools: &[PoolInfo]) -> Vec<PoolResponse> {
+pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<u32>) -> Vec<PoolResponse> {
 
     //查询
     let token_main_path = "./token_mint.json".to_string();
@@ -105,7 +106,14 @@ pub fn cal_rate(pools: &[PoolInfo]) -> Vec<PoolResponse> {
     for pool in pools {
         match &pool.market_type {
             Raydium(_x, _y) => {
-                let pool_info = cal_raydium(&account_map, &tokens_adr, &pool).unwrap();
+                let mut pool_info = cal_raydium(&account_map, &tokens_adr, &pool).unwrap();
+                match slippage {
+                    Some(a) => {
+                        let rate_fix = pool_info.rate.unwrap() / (1 as f64 + (a.clone() as f64 / 100.0));
+                        pool_info.rate = Some(rate_fix);
+                    }
+                    None => {}
+                }
                 res.push(pool_info);
             }
             Orca(_x, _y) => {}

@@ -254,7 +254,7 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
     let pool_info = match req.need_rate {
         Some(bool) => {
             if bool {
-                cal_rate(&opt_pool)
+                cal_rate(&opt_pool, &req.slippage)
             } else {
                 opt_pool.iter()
                     .map(|x| -> PoolResponse{
