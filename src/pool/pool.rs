@@ -26,7 +26,7 @@ pub struct PoolRequest {
     pub token_mint_a: Option<String>,
     pub token_mint_b: Option<String>,
     pub lp_mint: Option<String>,
-    pub slippage: Option<u32>,
+    pub slippage: Option<f32>,
     pub need_rate: Option<bool>,
 }
 
@@ -73,7 +73,7 @@ impl PoolRequest {
     }
 }
 
-pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<u32>) -> Vec<PoolResponse> {
+pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse> {
 
     //查询
     let token_main_path = "./token_mint.json".to_string();
@@ -109,7 +109,7 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<u32>) -> Vec<PoolResponse>
                 let mut pool_info = cal_raydium(&account_map, &tokens_adr, &pool).unwrap();
                 match slippage {
                     Some(a) => {
-                        let rate_fix = pool_info.rate.unwrap() / (1 as f64 + (a.clone() as f64 / 100.0));
+                        let rate_fix = pool_info.rate.unwrap() / (1.0 + (a.clone() / 100.0));
                         pool_info.rate = Some(rate_fix);
                     }
                     None => {}
@@ -175,7 +175,7 @@ fn cal_raydium(account_map: &HashMap<String, Account>,
         lp_mint: pool.lp_mint_key.to_string(),
         quote_value: pool.quote_value_key.to_string(),
         base_value: pool.base_value_key.to_string(),
-        rate: Some(amount_out_format.to_f64().unwrap()),
+        rate: Some(amount_out_format.to_f32().unwrap()),
         data: pool.data.clone(),
     })
 }

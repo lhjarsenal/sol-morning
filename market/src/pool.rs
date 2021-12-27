@@ -27,7 +27,7 @@ pub struct PoolResponse {
     pub lp_mint: String,
     pub quote_value: String,
     pub base_value: String,
-    pub rate: Option<f64>,
+    pub rate: Option<f32>,
     pub data: HashMap<String, String>,
 }
 

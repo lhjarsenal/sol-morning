@@ -40,7 +40,7 @@ pub struct OptRank {
     pub amount_out: f64,
     pub quote_mint: String,
     pub base_mint: String,
-    pub slippage: u32,
+    pub slippage: f32,
     pub opt: Vec<OptMarket>,
 }
 

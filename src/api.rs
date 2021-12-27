@@ -29,7 +29,7 @@ pub struct OptRequest {
     pub amount_in: f64,
     pub quote_mint: String,
     pub base_mint: String,
-    pub slippage: u32,
+    pub slippage: f32,
     pub exclude: Option<Vec<String>>,
 }
 

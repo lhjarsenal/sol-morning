@@ -31,7 +31,7 @@ pub struct OptInitData {
     pub tokens_adr: HashMap<String, TokenAddr>,
     pub account_map: HashMap<String, Account>,
     pub swaps: Vec<MarketSwap>,
-    pub slippage: u32,
+    pub slippage: f32,
 }
 
 impl OptInitData {
@@ -73,7 +73,7 @@ fn cal_raydium(amount_in: f64,
                swap: &MarketSwap,
                account_map: &HashMap<String, Account>,
                token_map: &HashMap<String, TokenAddr>,
-               slippage: u32) -> Result<OptMarket> {
+               slippage: f32) -> Result<OptMarket> {
     let mut res = vec![];
 
     let mut amount_in = amount_in;
@@ -108,7 +108,7 @@ fn cal_raydium(amount_in: f64,
             let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.swap_fee_denominator - pool_info.fees.swap_fee_numerator)).div(Decimal::from(pool_info.fees.swap_fee_denominator));
             let denominator = quote_amount.add(from_amount_with_fee);
             let amount_out = base_amount.mul(from_amount_with_fee).div(denominator);
-            let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
+            let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1.0 + slippage / 100.0).unwrap());
             amount_out_format.rescale(base_token.decimal as u32);
 
             res.push(OptRoute {
@@ -134,7 +134,7 @@ fn cal_raydium(amount_in: f64,
             let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.swap_fee_denominator - pool_info.fees.swap_fee_numerator)).div(Decimal::from(pool_info.fees.swap_fee_denominator));
             let denominator = base_amount.add(from_amount_with_fee);
             let amount_out = quote_amount.mul(from_amount_with_fee).div(denominator);
-            let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
+            let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1.0 + slippage / 100.0).unwrap());
             amount_out_format.rescale(quote_token.decimal as u32);
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
@@ -170,7 +170,7 @@ fn cal_orca(amount_in: f64,
             swap: &MarketSwap,
             account_map: &HashMap<String, Account>,
             token_map: &HashMap<String, TokenAddr>,
-            slippage: u32) -> Result<OptMarket> {
+            slippage: f32) -> Result<OptMarket> {
     let mut res = vec![];
 
     let mut amount_in = amount_in;
@@ -231,7 +231,7 @@ fn cal_orca(amount_in: f64,
                 }
             };
 
-            let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
+            let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1.0 + slippage / 100.0).unwrap());
             amount_out_format.rescale(base_token.decimal as u32);
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
@@ -279,7 +279,7 @@ fn cal_orca(amount_in: f64,
                 }
             };
 
-            let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
+            let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1.0 + slippage / 100.0).unwrap());
             amount_out_format.rescale(quote_token.decimal as u32);
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
@@ -315,7 +315,7 @@ fn cal_saber(amount_in: f64,
              swap: &MarketSwap,
              account_map: &HashMap<String, Account>,
              token_map: &HashMap<String, TokenAddr>,
-             slippage: u32) -> Result<OptMarket> {
+             slippage: f32) -> Result<OptMarket> {
     let mut res = vec![];
 
     let mut amount_in = amount_in;
@@ -358,7 +358,7 @@ fn cal_saber(amount_in: f64,
             let sc_result = stable_swap.swap_to(from_amount as u64, quote_info.amount, base_info.amount, &pool_info.fees).unwrap();
             let amount_out = Decimal::from_u64(sc_result.amount_swapped).unwrap();
 
-            let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
+            let mut amount_out_format = amount_out.div(Decimal::from(base_pow)).div(Decimal::from_f32(1.0 + slippage / 100.0).unwrap());
             amount_out_format.rescale(base_token.decimal as u32);
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
@@ -383,7 +383,7 @@ fn cal_saber(amount_in: f64,
 
             let sc_result = stable_swap.swap_to(from_amount as u64, base_info.amount, quote_info.amount, &pool_info.fees).unwrap();
             let amount_out = Decimal::from_u64(sc_result.amount_swapped).unwrap();
-            let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1 as f32 + slippage as f32 / 100 as f32).unwrap());
+            let mut amount_out_format = amount_out.div(Decimal::from(quote_pow)).div(Decimal::from_f32(1.0 + slippage / 100.0).unwrap());
             amount_out_format.rescale(quote_token.decimal as u32);
             res.push(OptRoute {
                 route_key: step.pool_key.to_string(),
