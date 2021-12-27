@@ -43,7 +43,8 @@ pub fn load_data_from_file(quote_mint: &String, base_mint: &String) -> Result<Ma
         data.insert("authority".to_string(), pool.authority.clone());
         data.insert("poolMint".to_string(), pool.pool_mint.clone());
         data.insert("feeAccount".to_string(), pool.fee_account.clone());
-
+        data.insert("poolQuoteValue".to_string(), pool.quote.reserves.clone());
+        data.insert("poolBaseValue".to_string(), pool.base.reserves.clone());
         if pool.quote.mint.eq(quote_mint) {
             let market_pool = MarketPool {
                 pool_key: Pubkey::from_str(&pool.account).unwrap(),
@@ -130,7 +131,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
                         quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
                         base_value_key: Pubkey::from_str(&raw_pool.base.reserves).unwrap(),
-                        data
+                        data,
                     });
                 }
             }
@@ -153,7 +154,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
                         quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
                         base_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
-                        data
+                        data,
                     });
                 } else if quote_mint_address.eq(&raw_pool.base.mint) && base_mint_address.eq(&raw_pool.quote.mint) {
                     let mut data = HashMap::new();
@@ -166,7 +167,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
                         quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
                         base_value_key: Pubkey::from_str(&raw_pool.base.reserves).unwrap(),
-                        data
+                        data,
                     });
                 }
             }
