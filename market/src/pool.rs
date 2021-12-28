@@ -49,6 +49,8 @@ pub struct TokenInfo {
     pub address: String,
     pub decimals: u8,
     pub name: String,
+    #[serde(rename = "logoURI")]
+    pub icon_uri: String,
 }
 
 impl RawPool {

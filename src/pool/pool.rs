@@ -139,6 +139,7 @@ pub fn fill_token_info(token_map: &HashMap<String, TokenAddr>, token_address: &s
                 address: a.mint.to_string(),
                 decimals: a.decimal.clone(),
                 name: a.description.to_string(),
+                icon_uri: a.icon_uri.to_string(),
             })
         }
         None => {

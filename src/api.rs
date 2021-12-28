@@ -143,6 +143,7 @@ pub struct TokenAddr {
     pub mint: Pubkey,
     pub decimal: u8,
     pub description: String,
+    pub icon_uri: String,
 }
 
 pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenAddr>> {
@@ -153,10 +154,11 @@ pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenA
         .map(|x| {
             let key = x.address.clone();
             (key, TokenAddr {
-                name: (x.symbol).to_string(),
+                name: x.symbol.to_string(),
                 mint: Pubkey::from_str(&x.address).unwrap(),
                 decimal: x.decimals,
-                description: (x.name).to_string(),
+                description: x.name.to_string(),
+                icon_uri: x.icon_uri.to_string(),
             })
         })
         .collect();
