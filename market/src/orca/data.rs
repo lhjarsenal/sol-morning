@@ -132,6 +132,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
                     }
                     data.insert("authority".to_string(), raw_pool.authority.clone());
+                    data.insert("feeAccount".to_string(), raw_pool.fee_account.clone());
                     return Some(PoolInfo {
                         market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
                         pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
@@ -158,6 +159,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
                     }
                     data.insert("authority".to_string(), raw_pool.authority.clone());
+                    data.insert("feeAccount".to_string(), raw_pool.fee_account.clone());
                     return Some(PoolInfo {
                         market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
                         pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
@@ -174,6 +176,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
                     }
                     data.insert("authority".to_string(), raw_pool.authority.clone());
+                    data.insert("feeAccount".to_string(), raw_pool.fee_account.clone());
                     return Some(PoolInfo {
                         market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
                         pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
