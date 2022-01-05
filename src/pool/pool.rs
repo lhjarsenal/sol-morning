@@ -77,7 +77,6 @@ impl PoolRequest {
         if need_orca {
             let orca_pool = orca::data::load_pool_from_file(self.lp_mint.clone(), self.token_mint_a.clone(),
                                                             self.token_mint_b.clone());
-
             if orca_pool.is_some() {
                 market_pool.push(orca_pool.unwrap());
             }
