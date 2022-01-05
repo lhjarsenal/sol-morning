@@ -181,17 +181,17 @@ fn cal_orca(amount_in: f64,
         let pool_ac = account_map.get(&step.pool_key.to_string()).unwrap();
         let pool_clone = pool_ac.clone();
         let pool_info = SwapV1::unpack_from_slice(&pool_clone.data).unwrap();
-
+        println!("pool_info={:?}", pool_info);
         let quote_ac = account_map.get(&step.quote_value_key.to_string()).unwrap();
         let mut quote_clone = quote_ac.clone();
         let quote_ac_info = convert_to_info(&step.quote_value_key, &mut quote_clone);
         let quote_info = Processor::unpack_token_account(&quote_ac_info, &quote_ac.owner).unwrap();
-
+        println!("quote_info={:?}", quote_info);
         let base_ac = account_map.get(&step.base_value_key.to_string()).unwrap();
         let mut base_clone = base_ac.clone();
         let base_ac_info = convert_to_info(&step.base_value_key, &mut base_clone);
         let base_info = Processor::unpack_token_account(&base_ac_info, &base_ac.owner).unwrap();
-
+        println!("base_info={:?}", base_info);
         let basic: i128 = 10;
         let quote_token = token_map.get(&step.quote_mint_key.to_string()).unwrap();
         let base_token = token_map.get(&step.base_mint_key.to_string()).unwrap();

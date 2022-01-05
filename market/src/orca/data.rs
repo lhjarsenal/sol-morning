@@ -128,7 +128,9 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
             for raw_pool in vec {
                 if raw_pool.pool_mint.eq(&lp) {
                     let mut data = HashMap::new();
-                    data.insert("some_key".to_string(), "some_value".to_string());
+                    if raw_pool.amp.is_some(){
+                        data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
+                    }
                     return Some(PoolInfo {
                         market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
                         pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
@@ -151,7 +153,9 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
             for raw_pool in vec {
                 if quote_mint_address.eq(&raw_pool.quote.mint) && base_mint_address.eq(&raw_pool.base.mint) {
                     let mut data = HashMap::new();
-                    data.insert("some_key".to_string(), "some_value".to_string());
+                    if raw_pool.amp.is_some(){
+                        data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
+                    }
                     return Some(PoolInfo {
                         market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
                         pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),
@@ -159,12 +163,14 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         base_mint_key: Pubkey::from_str(&raw_pool.base.mint).unwrap(),
                         lp_mint_key: Pubkey::from_str(&raw_pool.pool_mint).unwrap(),
                         quote_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
-                        base_value_key: Pubkey::from_str(&raw_pool.quote.reserves).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.base.reserves).unwrap(),
                         data,
                     });
                 } else if quote_mint_address.eq(&raw_pool.base.mint) && base_mint_address.eq(&raw_pool.quote.mint) {
                     let mut data = HashMap::new();
-                    data.insert("some_key".to_string(), "some_value".to_string());
+                    if raw_pool.amp.is_some(){
+                        data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
+                    }
                     return Some(PoolInfo {
                         market_type: MarketType::Orca(ORCA_MARKET.to_string(), ORCA_PROGRAM_ID.to_string()),
                         pool_key: Pubkey::from_str(&raw_pool.account).unwrap(),

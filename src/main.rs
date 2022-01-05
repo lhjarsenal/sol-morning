@@ -151,8 +151,8 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>, lp_mint: Option<String>, 
         Some(a) => {
             for mut pool in &mut vec {
                 if pool.lp_mint.eq(&a) {
-                    pool.quote_token = pool::pool::fill_token_info(&tokens_adr,&pool.quote_mint);
-                    pool.base_token = pool::pool::fill_token_info(&tokens_adr,&pool.base_mint);
+                    pool.quote_token = pool::pool::fill_token_info(&tokens_adr, &pool.quote_mint);
+                    pool.base_token = pool::pool::fill_token_info(&tokens_adr, &pool.base_mint);
                     return Json(PoolListResponse {
                         total: 1,
                         pagesize: 1,
@@ -193,7 +193,6 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>, lp_mint: Option<String>, 
             start_page = p - 1;
         }
         None => {
-
             for mut res_info in &mut vec {
                 res_info.quote_token = pool::pool::fill_token_info(&tokens_adr, &res_info.quote_mint);
                 res_info.base_token = pool::pool::fill_token_info(&tokens_adr, &res_info.base_mint);
