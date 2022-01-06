@@ -138,10 +138,11 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, 
     })
 }
 
-#[get("/pool_list?<page>&<pagesize>&<lp_mint>&<address>&<market>&<search>")]
+#[get("/pool_list?<page>&<pagesize>&<lp_mint>&<farm_mint>&<address>&<market>&<search>")]
 fn pool_list(page: Option<u32>, pagesize: Option<u32>,
-             lp_mint: Option<String>, address: Option<String>,
-             market: Option<String>, search: Option<String>) -> Json<PoolListResponse> {
+             lp_mint: Option<String>, farm_mint: Option<String>,
+             address: Option<String>, market: Option<String>,
+             search: Option<String>) -> Json<PoolListResponse> {
     let mut vec: Vec<RawPool> = load_pool_data(market);
     //查询
     let token_main_path = "./token_mint.json".to_string();
@@ -165,6 +166,44 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
                     });
                 }
             }
+            return Json(PoolListResponse {
+                total: 0,
+                pagesize: 1,
+                page: 1,
+                data: vec![],
+            });
+        }
+        None => {}
+    }
+
+    //查询固定某一个farm_mint
+    match farm_mint {
+        Some(a) => {
+
+            //加载farm-pool对应关系
+            let farm_main_path = "./resource/farm/orca.json".to_string();
+            let farm_pool_map = pool::pool::load_farm_data_from_file(&farm_main_path).unwrap();
+            let lp_mint = farm_pool_map.get(&a);
+            if lp_mint.is_some() {
+                for pool in &mut vec {
+                    if pool.lp_mint.eq(lp_mint.unwrap()) {
+                        return Json(PoolListResponse {
+                            total: 1,
+                            pagesize: 1,
+                            page: 1,
+                            data: vec![pool.clone()],
+                        });
+                    }
+                }
+            } else {
+                return Json(PoolListResponse {
+                    total: 0,
+                    pagesize: 1,
+                    page: 1,
+                    data: vec![],
+                });
+            }
+
             return Json(PoolListResponse {
                 total: 0,
                 pagesize: 1,

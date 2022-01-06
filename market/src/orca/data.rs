@@ -195,8 +195,8 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
     pool_info
 }
 
-pub fn calculate_pool_deposit_amount(quote_reserves: u64, _base_reserves: u64, pool_supply: u64) -> u64 {
-    let quote_amount = quote_reserves * (1 + 1000) / 1000;
+pub fn calculate_pool_deposit_amount(quote_reserves: u64, _base_reserves: u64, _pool_supply: u64) -> u64 {
+    let _quote_amount = quote_reserves * (1 + 1000) / 1000;
     // let base_amount = base_reserves * (1 + 1000) / 1000;
     // quote_amount * 1000 * pool_supply / quote_reserves / (1 + 1000)
     0

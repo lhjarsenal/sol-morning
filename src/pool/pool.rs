@@ -19,6 +19,7 @@ use rust_decimal::Decimal;
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
 use bytemuck::__core::ops::{Add, Mul, Div};
 use std::collections::HashMap;
+use std::fs;
 use solana_program::program_pack::Pack;
 use spl_token::state::Mint;
 use spl_token_swap::curve::base::SwapCurve;
@@ -132,7 +133,7 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse>
                 res.push(pool_info);
             }
             Orca(_x, _y) => {
-                let mut pool_info = cal_orca(&account_map, &tokens_adr, &pool).unwrap();
+                let pool_info = cal_orca(&account_map, &tokens_adr, &pool).unwrap();
                 // match slippage {
                 //     Some(a) => {
                 //         let rate_fix = pool_info.rate.unwrap() / (1.0 + (a.clone() / 100.0));
@@ -153,6 +154,26 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse>
 
 pub fn load_pool_data(market: Option<String>) -> Vec<RawPool> {
     RawPool::load_all_pool_data(market)
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RawFarm {
+    #[serde(rename = "baseTokenMint")]
+    pub lp_mint: String,
+    #[serde(rename = "farmTokenMint")]
+    pub farm_mint: String,
+}
+
+pub fn load_farm_data_from_file(path: &String) -> Result<HashMap<String, String>> {
+    let raw_info = fs::read_to_string(path).expect("Error read file");
+    let vec: Vec<RawFarm> = serde_json::from_str(&raw_info)?;
+    let res: HashMap<String, String> = vec
+        .iter()
+        .map(|x| {
+            (x.farm_mint.clone(), x.lp_mint.clone())
+        })
+        .collect();
+    Ok(res)
 }
 
 pub fn fill_token_info(token_map: &HashMap<String, TokenAddr>, token_address: &str) -> Option<TokenInfo> {
