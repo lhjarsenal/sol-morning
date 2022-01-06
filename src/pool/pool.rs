@@ -20,6 +20,7 @@ use rust_decimal::prelude::{FromPrimitive, ToPrimitive};
 use bytemuck::__core::ops::{Add, Mul, Div};
 use std::collections::HashMap;
 use solana_program::program_pack::Pack;
+use spl_token::state::Mint;
 use spl_token_swap::curve::base::SwapCurve;
 use spl_token_swap::curve::calculator::{CurveCalculator, TradeDirection};
 use spl_token_swap::curve::stable::StableCurve;
@@ -97,6 +98,7 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse>
         keys.push(pool.pool_key.clone());
         keys.push(pool.quote_value_key.clone());
         keys.push(pool.base_value_key.clone());
+        keys.push(pool.lp_mint_key.clone());
     }
 
     let client = RpcClient::new(NetworkType::Mainnet.url().to_string());
@@ -113,8 +115,6 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse>
             None => {}
         }
     }
-
-
 
     let mut res = vec![];
 
@@ -227,7 +227,7 @@ fn cal_raydium(account_map: &HashMap<String, Account>,
 fn cal_orca(account_map: &HashMap<String, Account>,
             token_map: &HashMap<String, TokenAddr>,
             pool: &PoolInfo) -> Result<PoolResponse> {
-    println!("pool={:?}", pool);
+
     let amount_in = 1.0;
 
     let pool_ac = account_map.get(&pool.pool_key.to_string()).unwrap();
@@ -243,6 +243,9 @@ fn cal_orca(account_map: &HashMap<String, Account>,
     let mut base_clone = base_ac.clone();
     let base_ac_info = convert_to_info(&pool.base_value_key, &mut base_clone);
     let base_info = Processor::unpack_token_account(&base_ac_info, &base_ac.owner).unwrap();
+
+    let pl_ac = account_map.get(&pool.lp_mint_key.to_string()).unwrap();
+    let pl_info = Mint::unpack(&pl_ac.data).unwrap();
 
     let basic: i128 = 10;
     let quote_token = token_map.get(&pool.quote_mint_key.to_string()).unwrap();
@@ -270,7 +273,7 @@ fn cal_orca(account_map: &HashMap<String, Account>,
                                              base_info.amount as u128,
                                              TradeDirection::AtoB).unwrap();
         amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
-        println!("StableCurve={}", amount_out);
+
     } else {
         let sc = SwapCurve::default();
         let sc_result = sc.calculator.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
@@ -278,13 +281,17 @@ fn cal_orca(account_map: &HashMap<String, Account>,
                                                         base_info.amount as u128,
                                                         TradeDirection::AtoB).unwrap();
         amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
-        println!("SwapCurve={}", amount_out);
+
     }
 
     let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
     amount_out_format.rescale(base_token.decimal as u32);
 
     let matket_type = pool.market_type.get_name();
+
+    let mut pool_data = pool.data.clone();
+    pool_data.insert("poolSupply".to_string(), pl_info.supply.to_string());
+
     Ok(PoolResponse {
         market: matket_type.0,
         program_id: matket_type.1,
@@ -295,6 +302,6 @@ fn cal_orca(account_map: &HashMap<String, Account>,
         quote_value: pool.quote_value_key.to_string(),
         base_value: pool.base_value_key.to_string(),
         rate: Some(amount_out_format.to_f32().unwrap()),
-        data: pool.data.clone(),
+        data: pool_data,
     })
 }

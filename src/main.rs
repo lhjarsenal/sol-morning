@@ -155,7 +155,7 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
     //查询固定某一个lp_mint
     match lp_mint {
         Some(a) => {
-            for mut pool in &mut vec {
+            for pool in &mut vec {
                 if pool.lp_mint.eq(&a) {
                     return Json(PoolListResponse {
                         total: 1,
@@ -233,7 +233,7 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
         end_index = total - 1;
     }
 
-    let mut res = vec[start_index as usize..end_index as usize].to_vec();
+    let res = vec[start_index as usize..end_index as usize].to_vec();
 
     Json(PoolListResponse {
         total,
