@@ -238,8 +238,7 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
 
     start_index = start_page * size;
     let mut end_index = start_index + size;
-    println!("end_index={}",end_index);
-    println!("total={}",total);
+
     if end_index >= total {
         end_index = total - 1;
     }

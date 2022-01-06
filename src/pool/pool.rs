@@ -133,13 +133,13 @@ pub fn cal_rate(pools: &[PoolInfo], slippage: &Option<f32>) -> Vec<PoolResponse>
             }
             Orca(_x, _y) => {
                 let mut pool_info = cal_orca(&account_map, &tokens_adr, &pool).unwrap();
-                match slippage {
-                    Some(a) => {
-                        let rate_fix = pool_info.rate.unwrap() / (1.0 + (a.clone() / 100.0));
-                        pool_info.rate = Some(rate_fix);
-                    }
-                    None => {}
-                }
+                // match slippage {
+                //     Some(a) => {
+                //         let rate_fix = pool_info.rate.unwrap() / (1.0 + (a.clone() / 100.0));
+                //         pool_info.rate = Some(rate_fix);
+                //     }
+                //     None => {}
+                // }
                 res.push(pool_info);
             }
             Saber(_x, _y) => {}
