@@ -227,7 +227,6 @@ fn cal_raydium(account_map: &HashMap<String, Account>,
 fn cal_orca(account_map: &HashMap<String, Account>,
             token_map: &HashMap<String, TokenAddr>,
             pool: &PoolInfo) -> Result<PoolResponse> {
-
     let amount_in = 1.0;
 
     let pool_ac = account_map.get(&pool.pool_key.to_string()).unwrap();
@@ -273,7 +272,6 @@ fn cal_orca(account_map: &HashMap<String, Account>,
                                              base_info.amount as u128,
                                              TradeDirection::AtoB).unwrap();
         amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
-
     } else {
         let sc = SwapCurve::default();
         let sc_result = sc.calculator.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
@@ -281,7 +279,6 @@ fn cal_orca(account_map: &HashMap<String, Account>,
                                                         base_info.amount as u128,
                                                         TradeDirection::AtoB).unwrap();
         amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
-
     }
 
     let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
@@ -291,7 +288,11 @@ fn cal_orca(account_map: &HashMap<String, Account>,
 
     let mut pool_data = pool.data.clone();
     pool_data.insert("poolSupply".to_string(), pl_info.supply.to_string());
+    pool_data.insert("quoteAmount".to_string(), quote_info.amount.to_string());
+    pool_data.insert("baseAmount".to_string(), base_info.amount.to_string());
 
+    // let pool_token_amount = orca::data::calculate_pool_deposit_amount(quote_info.amount, base_info.amount, pl_info.supply);
+    // pool_data.insert("poolTokenAmount".to_string(), pool_token_amount.to_string());
     Ok(PoolResponse {
         market: matket_type.0,
         program_id: matket_type.1,

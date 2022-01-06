@@ -128,7 +128,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
             for raw_pool in vec {
                 if raw_pool.pool_mint.eq(&lp) {
                     let mut data = HashMap::new();
-                    if raw_pool.amp.is_some(){
+                    if raw_pool.amp.is_some() {
                         data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
                     }
                     data.insert("authority".to_string(), raw_pool.authority.clone());
@@ -155,7 +155,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
             for raw_pool in vec {
                 if quote_mint_address.eq(&raw_pool.quote.mint) && base_mint_address.eq(&raw_pool.base.mint) {
                     let mut data = HashMap::new();
-                    if raw_pool.amp.is_some(){
+                    if raw_pool.amp.is_some() {
                         data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
                     }
                     data.insert("authority".to_string(), raw_pool.authority.clone());
@@ -172,7 +172,7 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                     });
                 } else if quote_mint_address.eq(&raw_pool.base.mint) && base_mint_address.eq(&raw_pool.quote.mint) {
                     let mut data = HashMap::new();
-                    if raw_pool.amp.is_some(){
+                    if raw_pool.amp.is_some() {
                         data.insert("amp".to_string(), raw_pool.amp.unwrap().to_string());
                     }
                     data.insert("authority".to_string(), raw_pool.authority.clone());
@@ -193,5 +193,12 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
         }
     };
     pool_info
+}
+
+pub fn calculate_pool_deposit_amount(quote_reserves: u64, _base_reserves: u64, pool_supply: u64) -> u64 {
+    let quote_amount = quote_reserves * (1 + 1000) / 1000;
+    // let base_amount = base_reserves * (1 + 1000) / 1000;
+    // quote_amount * 1000 * pool_supply / quote_reserves / (1 + 1000)
+    0
 }
 
