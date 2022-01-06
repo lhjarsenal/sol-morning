@@ -143,7 +143,6 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
              lp_mint: Option<String>, address: Option<String>,
              market: Option<String>, search: Option<String>) -> Json<PoolListResponse> {
     let mut vec: Vec<RawPool> = load_pool_data(market);
-    println!("vec_length={}", vec.len());
     //查询
     let token_main_path = "./token_mint.json".to_string();
     let tokens_adr = api::load_token_data_from_file(&token_main_path).expect("load token data fail");
@@ -202,7 +201,6 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
         }
         None => {}
     }
-    println!("search_len={}", vec.len());
     let start_page;
     let mut size = 50;
     let start_index;
