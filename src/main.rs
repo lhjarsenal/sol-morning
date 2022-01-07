@@ -320,14 +320,28 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
 
 #[post("/pool_info", data = "<req>")]
 fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
-    println!("req={:?}", req.0);
 
-    let opt_pool = req.0.load_data();
+    let mut request = req.0;
 
-    let pool_info = match req.need_rate {
+    if request.farm_mint.is_some(){
+        //加载farm-pool对应关系
+        let farm_mint = request.farm_mint.clone().unwrap();
+        let farm_main_path = "./resource/farm/orca.json".to_string();
+        let farm_pool_map = pool::pool::load_farm_data_from_file(&farm_main_path).unwrap();
+        let lp_mint = farm_pool_map.get(&farm_mint);
+        if lp_mint.is_some(){
+            request.lp_mint = lp_mint.cloned();
+        }else {
+            return Json(vec![]);
+        }
+    }
+
+    let opt_pool = request.load_data();
+
+    let pool_info = match request.need_rate {
         Some(bool) => {
             if bool {
-                cal_rate(&opt_pool, &req.slippage)
+                cal_rate(&opt_pool, &request.slippage)
             } else {
                 opt_pool.iter()
                     .map(|x| -> PoolResponse{

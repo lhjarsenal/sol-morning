@@ -34,6 +34,7 @@ pub struct PoolRequest {
     pub token_mint_a: Option<String>,
     pub token_mint_b: Option<String>,
     pub lp_mint: Option<String>,
+    pub farm_mint: Option<String>,
     pub slippage: Option<f32>,
     pub need_rate: Option<bool>,
 }
