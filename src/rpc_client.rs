@@ -8,7 +8,7 @@ use pool::load_farm_data_from_file;
 
 const SOLSCAN_TRANSACTION_URL: &str = "https://public-api.solscan.io/account/transactions?account=";
 const SOLSCAN_DETAIL_URL: &str = "https://public-api.solscan.io/transaction/";
-const SOLSCAN_ASSET_URL: &str = "https://api.solscan.io/account/tokens?address=";
+const SOLSCAN_ASSET_URL: &str = "https://api.solscan.io/account/tokens?price=1&address=";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccountRequest {
@@ -92,6 +92,9 @@ pub struct AssetResponse {
     lamports: u64,
     #[serde(rename = "tokenSymbol")]
     token_symbol: Option<String>,
+    #[serde(rename = "priceUsdt")]
+    price_usdt: Option<f64>,
+
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
