@@ -32,13 +32,14 @@ use rocket_contrib::json::Json;
 use api::{OptRequest, RawTokenAddr};
 use response::{OptResponse, TokenListResponse};
 use std::fs;
-use rpc_client::{HistoryRequest, TxResponse};
+use rpc_client::{AccountRequest, TxResponse};
 use rocket::http::Method;
 use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
 use pool::pool::{PoolRequest, cal_rate};
 use market::pool::{PoolResponse, RawPool};
 use pool::pool::load_pool_data;
 use crate::response::PoolListResponse;
+use crate::rpc_client::{AssetResponse, OutApiResponse};
 
 
 #[get("/")]
@@ -48,11 +49,24 @@ fn index() -> &'static str {
 
 #[get("/history?<address>&<before>")]
 fn history(address: String, before: Option<String>) -> Json<Vec<TxResponse>> {
-    let req = HistoryRequest {
+    let req = AccountRequest {
         address,
         before,
     };
     Json(req.get_history())
+}
+
+#[get("/assets?<address>")]
+fn assets(address: String) -> Json<OutApiResponse<AssetResponse>> {
+    let req = AccountRequest {
+        address,
+        before: None,
+    };
+    
+    Json(OutApiResponse{
+        success:true,
+        data:req.get_assets()
+    })
 }
 
 #[get("/token_list?<page>&<pagesize>&<search>&<address>")]
@@ -320,18 +334,17 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
 
 #[post("/pool_info", data = "<req>")]
 fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
-
     let mut request = req.0;
 
-    if request.farm_mint.is_some(){
+    if request.farm_mint.is_some() {
         //加载farm-pool对应关系
         let farm_mint = request.farm_mint.clone().unwrap();
         let farm_main_path = "./resource/farm/orca.json".to_string();
         let farm_pool_map = pool::pool::load_farm_data_from_file(&farm_main_path).unwrap();
         let lp_mint = farm_pool_map.get(&farm_mint);
-        if lp_mint.is_some(){
+        if lp_mint.is_some() {
             request.lp_mint = lp_mint.cloned();
-        }else {
+        } else {
             return Json(vec![]);
         }
     }
@@ -386,7 +399,7 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, opt_swap, token_list,pool_list, history, pool_info])
+        .mount("/", routes![index, assets, opt_swap, token_list,pool_list, history, pool_info])
         .attach(get_cors())
         .launch();
 }

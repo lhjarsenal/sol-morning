@@ -3,12 +3,15 @@ use serde::{Serialize, Deserialize};
 use std::thread;
 use std::sync::mpsc;
 use safe_transmute::alloc::sync::Arc;
+use crate::pool::pool;
+use pool::load_farm_data_from_file;
 
 const SOLSCAN_TRANSACTION_URL: &str = "https://public-api.solscan.io/account/transactions?account=";
 const SOLSCAN_DETAIL_URL: &str = "https://public-api.solscan.io/transaction/";
+const SOLSCAN_ASSET_URL: &str = "https://api.solscan.io/account/tokens?address=";
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct HistoryRequest {
+pub struct AccountRequest {
     pub address: String,
     pub before: Option<String>,
 }
@@ -65,8 +68,43 @@ pub struct TxInputAccount {
     post_balance: u64,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct OutApiResponse<T> {
+    #[serde(rename = "succcess")]
+    pub(crate) success: bool,
+    pub(crate) data: Vec<T>,
+}
 
-impl HistoryRequest {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct AssetResponse {
+    #[serde(rename = "tokenAddress")]
+    token_address: String,
+    #[serde(rename = "tokenAmount")]
+    token_amount: TokenAmount,
+    #[serde(rename = "tokenAccount")]
+    token_account: String,
+    #[serde(rename = "tokenName")]
+    token_name: String,
+    #[serde(rename = "tokenIcon")]
+    token_icon: String,
+    #[serde(rename = "rentEpoch")]
+    rent_epoch: u64,
+    lamports: u64,
+    #[serde(rename = "tokenSymbol")]
+    token_symbol: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TokenAmount {
+    amount: String,
+    decimals: u64,
+    #[serde(rename = "uiAmount")]
+    ui_amount: f64,
+    #[serde(rename = "uiAmountString")]
+    ui_amount_string: String,
+}
+
+impl AccountRequest {
     pub fn get_history(&self) -> Vec<TxResponse> {
         let mut transaction_url: String = SOLSCAN_TRANSACTION_URL.to_owned() + &self.address.clone();
 
@@ -100,5 +138,51 @@ impl HistoryRequest {
         }
 
         tx_res
+    }
+
+    pub fn get_assets(&self) -> Vec<AssetResponse> {
+        let asset_url: String = SOLSCAN_ASSET_URL.to_owned() + &self.address.clone();
+
+        let orca_farm_key = "Aquafarm".trim();
+
+        let res = reqwest::blocking::get(asset_url).unwrap();
+        let asset_res = res.json::<OutApiResponse<AssetResponse>>().unwrap();
+
+        let asset_map: HashMap<String, AssetResponse> = asset_res.data
+            .iter()
+            .map(|x| {
+                let key = x.token_address.clone();
+                (key, x.clone())
+            })
+            .collect();
+
+        //加载farm-pool对应关系
+        let farm_main_path = "./resource/farm/orca.json".to_string();
+        let farm_pool_map = load_farm_data_from_file(&farm_main_path).unwrap();
+
+        let mut res = vec![];
+
+        for asset in &mut asset_res.data.iter() {
+            if asset.token_name.eq("") {
+                continue;
+            }
+            if asset.token_name.contains(orca_farm_key) {
+                let pool_address = farm_pool_map.get(&asset.token_address);
+                if pool_address.is_some() {
+                    let pool_option = asset_map.get(pool_address.unwrap());
+                    if pool_option.is_some() {
+                        let mut pool_asset = pool_option.unwrap().clone();
+                        pool_asset.token_name = asset.token_name.clone();
+                        pool_asset.token_icon = asset.token_icon.clone();
+                        pool_asset.token_symbol = asset.token_symbol.clone();
+                        res.push(pool_asset);
+                    }
+                }
+            } else {
+                res.push(asset.clone());
+            }
+        }
+
+        res
     }
 }
