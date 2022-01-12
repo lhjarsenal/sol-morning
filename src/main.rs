@@ -62,15 +62,15 @@ fn assets(address: String) -> Json<OutApiResponse<AssetResponse>> {
         address,
         before: None,
     };
-    
-    Json(OutApiResponse{
-        success:true,
-        data:req.get_assets()
+
+    Json(OutApiResponse {
+        success: true,
+        data: req.get_assets(),
     })
 }
 
-#[get("/token_list?<page>&<pagesize>&<search>&<address>")]
-fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, address: Option<String>) -> Json<TokenListResponse> {
+#[get("/token_list?<page>&<pagesize>&<search>&<address>&<symbol>")]
+fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, address: Option<String>, symbol: Option<String>) -> Json<TokenListResponse> {
     let token_main_path = "./token_mint.json".to_string();
     let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
     let mut vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
@@ -100,13 +100,36 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, 
 
     //模糊查询symbol
     match search {
-        Some(symbol) => {
-            let match_symbol = symbol.trim();
+        Some(search) => {
+            let match_search = search.trim();
             vec = vec
                 .into_iter()
                 .filter(|x|
-                    x.symbol.to_uppercase().trim().contains(match_symbol)
+                    x.symbol.to_uppercase().trim().contains(match_search)
                 ).collect();
+        }
+        None => {}
+    }
+
+    //精确查询symbol
+    match symbol {
+        Some(symbol) => {
+            for token in vec.iter() {
+                if token.symbol.eq(&symbol) {
+                    return Json(TokenListResponse {
+                        total: 1,
+                        pagesize: 1,
+                        page: 1,
+                        data: vec![token.clone()],
+                    });
+                }
+            }
+            return Json(TokenListResponse {
+                total: 0,
+                pagesize: 1,
+                page: 1,
+                data: vec![],
+            });
         }
         None => {}
     }
