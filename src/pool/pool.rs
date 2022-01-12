@@ -177,6 +177,18 @@ pub fn load_farm_data_from_file(path: &String) -> Result<HashMap<String, String>
     Ok(res)
 }
 
+pub fn load_pool_farm_data_from_file(path: &String) -> Result<HashMap<String, String>> {
+    let raw_info = fs::read_to_string(path).expect("Error read file");
+    let vec: Vec<RawFarm> = serde_json::from_str(&raw_info)?;
+    let res: HashMap<String, String> = vec
+        .iter()
+        .map(|x| {
+            (x.lp_mint.clone(), x.farm_mint.clone())
+        })
+        .collect();
+    Ok(res)
+}
+
 pub fn fill_token_info(token_map: &HashMap<String, TokenAddr>, token_address: &str) -> Option<TokenInfo> {
     let token = token_map.get(token_address);
     let info = match token {

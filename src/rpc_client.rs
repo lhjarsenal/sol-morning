@@ -4,7 +4,9 @@ use std::thread;
 use std::sync::mpsc;
 use safe_transmute::alloc::sync::Arc;
 use crate::pool::pool;
-use pool::load_farm_data_from_file;
+use crate::api;
+use pool::load_pool_farm_data_from_file;
+use api::load_token_data_from_file;
 
 const SOLSCAN_TRANSACTION_URL: &str = "https://public-api.solscan.io/account/transactions?account=";
 const SOLSCAN_DETAIL_URL: &str = "https://public-api.solscan.io/transaction/";
@@ -146,38 +148,40 @@ impl AccountRequest {
     pub fn get_assets(&self) -> Vec<AssetResponse> {
         let asset_url: String = SOLSCAN_ASSET_URL.to_owned() + &self.address.clone();
 
+        //遇到此资产滤掉
         let orca_farm_key = "Aquafarm".trim();
 
         let res = reqwest::blocking::get(asset_url).unwrap();
         let asset_res = res.json::<OutApiResponse<AssetResponse>>().unwrap();
 
-        let asset_map: HashMap<String, AssetResponse> = asset_res.data
-            .iter()
-            .map(|x| {
-                let key = x.token_address.clone();
-                (key, x.clone())
-            })
-            .collect();
-
         //加载farm-pool对应关系
         let farm_main_path = "./resource/farm/orca.json".to_string();
-        let farm_pool_map = load_farm_data_from_file(&farm_main_path).unwrap();
+        let pool_farm_map = load_pool_farm_data_from_file(&farm_main_path).unwrap();
+
+        //查询
+        let token_main_path = "./token_mint.json".to_string();
+        let tokens_adr = load_token_data_from_file(&token_main_path).expect("load token data fail");
 
         let mut res = vec![];
 
         for asset in &mut asset_res.data.iter() {
-            if asset.token_name.eq("") {
+            if asset.token_name.contains(orca_farm_key) {
+                //滤掉orca farm资产
                 continue;
             }
-            if asset.token_name.contains(orca_farm_key) {
-                let pool_address = farm_pool_map.get(&asset.token_address);
-                if pool_address.is_some() {
-                    let pool_option = asset_map.get(pool_address.unwrap());
-                    if pool_option.is_some() {
-                        let mut pool_asset = pool_option.unwrap().clone();
-                        pool_asset.token_name = asset.token_name.clone();
-                        pool_asset.token_icon = asset.token_icon.clone();
-                        pool_asset.token_symbol = asset.token_symbol.clone();
+            if asset.token_name.eq("") {
+                let farm_address = pool_farm_map.get(&asset.token_address);
+
+                //处理 orca pool 回填信息
+                if farm_address.is_some() {
+                    let farm_option = tokens_adr.get(farm_address.unwrap());
+
+                    if farm_option.is_some() {
+                        let token_info = farm_option.unwrap();
+                        let mut pool_asset = asset.clone();
+                        pool_asset.token_name = token_info.description.clone();
+                        pool_asset.token_icon = token_info.icon_uri.clone();
+                        pool_asset.token_symbol = Some(token_info.name.clone());
                         res.push(pool_asset);
                     }
                 }
