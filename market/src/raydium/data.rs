@@ -209,8 +209,8 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         quote_mint_key: Pubkey::from_str(&raw_pool.quote_mint).unwrap(),
                         base_mint_key: Pubkey::from_str(&raw_pool.base_mint).unwrap(),
                         lp_mint_key: Pubkey::from_str(&raw_pool.lp_mint).unwrap(),
-                        quote_value_key: Pubkey::from_str(&raw_pool.market_quote_vault).unwrap(),
-                        base_value_key: Pubkey::from_str(&raw_pool.market_base_vault).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.quote_vault).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.base_vault).unwrap(),
                         data
                     });
                 }
@@ -248,8 +248,8 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         quote_mint_key: Pubkey::from_str(&raw_pool.quote_mint).unwrap(),
                         base_mint_key: Pubkey::from_str(&raw_pool.base_mint).unwrap(),
                         lp_mint_key: Pubkey::from_str(&raw_pool.lp_mint).unwrap(),
-                        quote_value_key: Pubkey::from_str(&raw_pool.market_quote_vault).unwrap(),
-                        base_value_key: Pubkey::from_str(&raw_pool.market_base_vault).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.quote_vault).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.base_vault).unwrap(),
                         data
                     });
                 } else if quote_mint_address.eq(&raw_pool.base_mint) && base_mint_address.eq(&raw_pool.quote_mint) {
@@ -275,8 +275,8 @@ pub fn load_pool_from_file(lp_mint: Option<String>,
                         quote_mint_key: Pubkey::from_str(&raw_pool.quote_mint).unwrap(),
                         base_mint_key: Pubkey::from_str(&raw_pool.base_mint).unwrap(),
                         lp_mint_key: Pubkey::from_str(&raw_pool.lp_mint).unwrap(),
-                        quote_value_key: Pubkey::from_str(&raw_pool.market_quote_vault).unwrap(),
-                        base_value_key: Pubkey::from_str(&raw_pool.market_base_vault).unwrap(),
+                        quote_value_key: Pubkey::from_str(&raw_pool.quote_vault).unwrap(),
+                        base_value_key: Pubkey::from_str(&raw_pool.base_vault).unwrap(),
                         data
                     });
                 }
