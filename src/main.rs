@@ -8,6 +8,7 @@ pub mod node_client;
 mod opt_core;
 mod rpc_client;
 pub mod pool;
+pub mod token;
 
 #[macro_use]
 extern crate rocket;
@@ -29,17 +30,16 @@ extern crate safe_transmute;
 
 
 use rocket_contrib::json::Json;
-use api::{OptRequest, RawTokenAddr};
+use api::OptRequest;
 use response::{OptResponse, TokenListResponse};
-use std::fs;
 use rpc_client::{AccountRequest, TxResponse};
 use rocket::http::Method;
 use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
-use pool::pool::{PoolRequest, cal_rate};
-use market::pool::{PoolResponse, RawPool};
-use pool::pool::load_pool_data;
+use pool::pool::PoolRequest;
+use market::pool::PoolResponse;
 use crate::response::PoolListResponse;
 use crate::rpc_client::{AssetResponse, OutApiResponse};
+use crate::token::token::WoreholeAddress;
 
 
 #[get("/")]
@@ -70,109 +70,10 @@ fn assets(address: String) -> Json<OutApiResponse<AssetResponse>> {
 }
 
 #[get("/token_list?<page>&<pagesize>&<search>&<address>&<symbol>")]
-fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, address: Option<String>, symbol: Option<String>) -> Json<TokenListResponse> {
-    let token_main_path = "./token_mint.json".to_string();
-    let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
-    let mut vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
-
-    //查询固定某一个address
-    match address {
-        Some(a) => {
-            for token in vec.iter() {
-                if token.address.eq(&a) {
-                    return Json(TokenListResponse {
-                        total: 1,
-                        pagesize: 1,
-                        page: 1,
-                        data: vec![token.clone()],
-                    });
-                }
-            }
-            return Json(TokenListResponse {
-                total: 0,
-                pagesize: 1,
-                page: 1,
-                data: vec![],
-            });
-        }
-        None => {}
-    }
-
-    //模糊查询symbol
-    match search {
-        Some(search) => {
-            let match_search = search.trim();
-            vec = vec
-                .into_iter()
-                .filter(|x|
-                    x.symbol.to_uppercase().trim().contains(match_search)
-                ).collect();
-        }
-        None => {}
-    }
-
-    //精确查询symbol
-    match symbol {
-        Some(symbol) => {
-            for token in vec.iter() {
-                if token.symbol.eq(&symbol) {
-                    return Json(TokenListResponse {
-                        total: 1,
-                        pagesize: 1,
-                        page: 1,
-                        data: vec![token.clone()],
-                    });
-                }
-            }
-            return Json(TokenListResponse {
-                total: 0,
-                pagesize: 1,
-                page: 1,
-                data: vec![],
-            });
-        }
-        None => {}
-    }
-
-    let start_page;
-    let mut size = 50;
-    let start_index;
-    let total = vec.len() as u32;
-    match page {
-        Some(p) => {
-            start_page = p - 1;
-        }
-        None => {
-            return Json(TokenListResponse {
-                total,
-                pagesize: total,
-                page: 1,
-                data: vec,
-            });
-        }
-    }
-
-    match pagesize {
-        Some(s) => {
-            size = s;
-        }
-        None => {}
-    }
-
-    start_index = start_page * size;
-    let mut end_index = start_index + size;
-
-    if end_index >= total {
-        end_index = total - 1;
-    }
-
-    let res = vec[start_index as usize..end_index as usize].to_vec();
-    Json(TokenListResponse {
-        total,
-        pagesize: size,
-        page: start_page + 1,
-        data: res,
-    })
+fn token_list(page: Option<u32>, pagesize: Option<u32>,
+              search: Option<String>, address: Option<String>,
+              symbol: Option<String>) -> Json<TokenListResponse> {
+    token::token::token_list(page, pagesize, search, address, symbol)
 }
 
 #[get("/pool_list?<page>&<pagesize>&<lp_mint>&<farm_mint>&<address>&<market>&<search>")]
@@ -180,153 +81,7 @@ fn pool_list(page: Option<u32>, pagesize: Option<u32>,
              lp_mint: Option<String>, farm_mint: Option<String>,
              address: Option<String>, market: Option<String>,
              search: Option<String>) -> Json<PoolListResponse> {
-    let mut vec: Vec<RawPool> = load_pool_data(market);
-    //查询
-    let token_main_path = "./token_mint.json".to_string();
-    let tokens_adr = api::load_token_data_from_file(&token_main_path).expect("load token data fail");
-
-    for mut pool in &mut vec {
-        pool.quote_token = pool::pool::fill_token_info(&tokens_adr, &pool.quote_mint);
-        pool.base_token = pool::pool::fill_token_info(&tokens_adr, &pool.base_mint);
-    }
-
-    //查询固定某一个lp_mint
-    match lp_mint {
-        Some(a) => {
-            for pool in &mut vec {
-                if pool.lp_mint.eq(&a) {
-                    return Json(PoolListResponse {
-                        total: 1,
-                        pagesize: 1,
-                        page: 1,
-                        data: vec![pool.clone()],
-                    });
-                }
-            }
-            return Json(PoolListResponse {
-                total: 0,
-                pagesize: 1,
-                page: 1,
-                data: vec![],
-            });
-        }
-        None => {}
-    }
-
-    //查询固定某一个farm_mint
-    match farm_mint {
-        Some(a) => {
-
-            //加载farm-pool对应关系
-            let farm_main_path = "./resource/farm/orca.json".to_string();
-            let farm_pool_map = pool::pool::load_farm_data_from_file(&farm_main_path).unwrap();
-            let lp_mint = farm_pool_map.get(&a);
-            if lp_mint.is_some() {
-                for pool in &mut vec {
-                    if pool.lp_mint.eq(lp_mint.unwrap()) {
-                        return Json(PoolListResponse {
-                            total: 1,
-                            pagesize: 1,
-                            page: 1,
-                            data: vec![pool.clone()],
-                        });
-                    }
-                }
-            } else {
-                return Json(PoolListResponse {
-                    total: 0,
-                    pagesize: 1,
-                    page: 1,
-                    data: vec![],
-                });
-            }
-
-            return Json(PoolListResponse {
-                total: 0,
-                pagesize: 1,
-                page: 1,
-                data: vec![],
-            });
-        }
-        None => {}
-    }
-
-    //固定查询某个token
-    match address {
-        Some(add) => {
-            let match_add = add.trim();
-            vec = vec
-                .into_iter()
-                .filter(|x|
-                    x.quote_mint.eq(match_add) || x.base_mint.eq(match_add)
-                ).collect();
-        }
-        None => {}
-    }
-
-    //模糊查询symbol
-    match search {
-        Some(symbol) => {
-            let match_symbol = symbol.trim();
-            vec = vec
-                .into_iter()
-                .filter(|x|
-                    (x.quote_token.is_some() && x.quote_token.as_ref().unwrap().symbol.to_uppercase().trim().contains(match_symbol)) ||
-                        (x.base_token.is_some() && x.base_token.as_ref().unwrap().symbol.clone().to_uppercase().trim().contains(match_symbol))
-                ).collect();
-        }
-        None => {}
-    }
-    let start_page;
-    let mut size = 50;
-    let start_index;
-    let total = vec.len() as u32;
-
-    if total == 0 {
-        return Json(PoolListResponse {
-            total,
-            pagesize: total,
-            page: 1,
-            data: vec![],
-        });
-    }
-
-    match page {
-        Some(p) => {
-            start_page = p - 1;
-        }
-        None => {
-            return Json(PoolListResponse {
-                total,
-                pagesize: total,
-                page: 1,
-                data: vec,
-            });
-        }
-    }
-
-    match pagesize {
-        Some(s) => {
-            size = s;
-        }
-        None => {}
-    }
-
-    start_index = start_page * size;
-    let mut end_index = start_index + size;
-
-    if end_index >= total {
-        end_index = total - 1;
-    }
-
-    let res = vec[start_index as usize..end_index as usize].to_vec();
-
-    Json(PoolListResponse {
-        total,
-        pagesize: size,
-        page: start_page + 1,
-        data: res,
-    })
+    pool::pool::pool_list(page, pagesize, lp_mint, farm_mint, address, market, search)
 }
 
 #[post("/opt_swap", data = "<req>")]
@@ -357,72 +112,36 @@ fn opt_swap(req: Json<OptRequest>) -> Json<OptResponse> {
 
 #[post("/pool_info", data = "<req>")]
 fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
-    let mut request = req.0;
+    pool::pool::pool_info(req)
+}
 
-    if request.farm_mint.is_some() {
-        //加载farm-pool对应关系
-        let farm_mint = request.farm_mint.clone().unwrap();
-        let farm_main_path = "./resource/farm/orca.json".to_string();
-        let farm_pool_map = pool::pool::load_farm_data_from_file(&farm_main_path).unwrap();
-        let lp_mint = farm_pool_map.get(&farm_mint);
-        if lp_mint.is_some() {
-            request.lp_mint = lp_mint.cloned();
-        } else {
-            return Json(vec![]);
-        }
+#[get("/eth_tokens?<page>&<pagesize>&<search>&<address>&<symbol>")]
+fn eth_tokens(page: Option<u32>, pagesize: Option<u32>,
+              search: Option<String>, address: Option<String>,
+              symbol: Option<String>) -> Json<TokenListResponse> {
+    token::token::eth_tokens(page, pagesize, search, address, symbol)
+}
+
+#[get("/bridge_token?<source_chain>&<to_chain>&<origin_address>&<wrap_address>")]
+fn bridge_token(source_chain: String, to_chain: String,
+                origin_address: Option<String>, wrap_address: Option<String>) -> Json<WoreholeAddress> {
+
+    if origin_address.is_some(){
+        Json(token::token::bridge_token_by_origin(source_chain, to_chain, origin_address.unwrap()))
+    }else if wrap_address.is_some(){
+        Json(token::token::bridge_token_by_wrap(source_chain, to_chain, wrap_address.unwrap()))
+    }else {
+        Json(WoreholeAddress{
+            origin_address: "".to_string(),
+            target_token: None
+        })
     }
-
-    let opt_pool = request.load_data();
-
-    let pool_info = match request.need_rate {
-        Some(bool) => {
-            if bool {
-                cal_rate(&opt_pool, &request.slippage)
-            } else {
-                opt_pool.iter()
-                    .map(|x| -> PoolResponse{
-                        let market_type = x.market_type.get_name();
-                        PoolResponse {
-                            market: market_type.0,
-                            program_id: market_type.1,
-                            pool_account: x.pool_key.to_string(),
-                            quote_mint: x.quote_mint_key.to_string(),
-                            base_mint: x.base_mint_key.to_string(),
-                            lp_mint: x.lp_mint_key.to_string(),
-                            quote_value: x.quote_value_key.to_string(),
-                            base_value: x.base_value_key.to_string(),
-                            rate: None,
-                            data: x.data.clone(),
-                        }
-                    }).collect()
-            }
-        }
-        None => {
-            opt_pool.iter()
-                .map(|x| -> PoolResponse{
-                    let market_type = x.market_type.get_name();
-                    PoolResponse {
-                        market: market_type.0,
-                        program_id: market_type.1,
-                        pool_account: x.pool_key.to_string(),
-                        quote_mint: x.quote_mint_key.to_string(),
-                        base_mint: x.base_mint_key.to_string(),
-                        lp_mint: x.lp_mint_key.to_string(),
-                        quote_value: x.quote_value_key.to_string(),
-                        base_value: x.base_value_key.to_string(),
-                        rate: None,
-                        data: x.data.clone(),
-                    }
-                }).collect()
-        }
-    };
-
-    Json(pool_info)
 }
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, assets, opt_swap, token_list,pool_list, history, pool_info])
+        .mount("/", routes![index, assets, opt_swap, token_list,
+            pool_list, history, pool_info, eth_tokens, bridge_token])
         .attach(get_cors())
         .launch();
 }
