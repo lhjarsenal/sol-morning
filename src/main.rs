@@ -69,11 +69,29 @@ fn assets(address: String) -> Json<OutApiResponse<AssetResponse>> {
     })
 }
 
-#[get("/token_list?<page>&<pagesize>&<search>&<address>&<symbol>")]
+#[get("/token_list?<page>&<pagesize>&<search>&<address>&<symbol>&<chain>")]
 fn token_list(page: Option<u32>, pagesize: Option<u32>,
               search: Option<String>, address: Option<String>,
-              symbol: Option<String>) -> Json<TokenListResponse> {
-    token::token::token_list(page, pagesize, search, address, symbol)
+              symbol: Option<String>, chain:Option<String>) -> Json<TokenListResponse> {
+    match chain {
+        None=>{
+            token::token::token_list(page, pagesize, search, address, symbol)
+        },
+        Some(chain_type)=>{
+            if chain_type.eq("ethereum"){
+                token::token::eth_tokens(page, pagesize, search, address, symbol)
+            }else {
+                Json(TokenListResponse{
+                    total: 0,
+                    pagesize: 0,
+                    page: 0,
+                    data: vec![]
+                })
+            }
+
+        }
+    }
+
 }
 
 #[get("/pool_list?<page>&<pagesize>&<lp_mint>&<farm_mint>&<address>&<market>&<search>")]
@@ -115,12 +133,12 @@ fn pool_info(req: Json<PoolRequest>) -> Json<Vec<PoolResponse>> {
     pool::pool::pool_info(req)
 }
 
-#[get("/eth_tokens?<page>&<pagesize>&<search>&<address>&<symbol>")]
-fn eth_tokens(page: Option<u32>, pagesize: Option<u32>,
-              search: Option<String>, address: Option<String>,
-              symbol: Option<String>) -> Json<TokenListResponse> {
-    token::token::eth_tokens(page, pagesize, search, address, symbol)
-}
+// #[get("/eth_tokens?<page>&<pagesize>&<search>&<address>&<symbol>")]
+// fn eth_tokens(page: Option<u32>, pagesize: Option<u32>,
+//               search: Option<String>, address: Option<String>,
+//               symbol: Option<String>) -> Json<TokenListResponse> {
+//     token::token::eth_tokens(page, pagesize, search, address, symbol)
+// }
 
 #[get("/bridge_token?<source_chain>&<to_chain>&<origin_address>&<wrap_address>")]
 fn bridge_token(source_chain: String, to_chain: String,
@@ -141,7 +159,7 @@ fn bridge_token(source_chain: String, to_chain: String,
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, assets, opt_swap, token_list,
-            pool_list, history, pool_info, eth_tokens, bridge_token])
+            pool_list, history, pool_info, bridge_token])
         .attach(get_cors())
         .launch();
 }
