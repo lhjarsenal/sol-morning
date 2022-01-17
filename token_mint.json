@@ -9958,18 +9958,6 @@
   },
   {
     "chainId": 102,
-    "address": "So11111111111111111111111111111111111111112",
-    "symbol": "wSOL",
-    "name": "Wrapped SOL",
-    "decimals": 9,
-    "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
-    "extensions": {
-      "coingeckoId": "solana",
-      "website": "https://www.solana.com/"
-    }
-  },
-  {
-    "chainId": 102,
     "address": "CpMah17kQEL2wqyMKt3mZBdTnZbkbfx4nqmQMFDP5vwp",
     "symbol": "USDC",
     "name": "USD Coin",
@@ -10083,17 +10071,6 @@
     ],
     "extensions": {
       "website": "https://robin.com"
-    }
-  },
-  {
-    "chainId": 103,
-    "address": "So11111111111111111111111111111111111111112",
-    "symbol": "SOL",
-    "name": "Wrapped SOL",
-    "decimals": 9,
-    "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
-    "extensions": {
-      "coingeckoId": "solana"
     }
   },
   {
