@@ -135,6 +135,8 @@ pub struct RawTokenAddr {
     pub name: String,
     #[serde(rename = "logoURI")]
     pub icon_uri: String,
+    #[serde(rename = "isNative")]
+    pub is_native: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -144,6 +146,7 @@ pub struct TokenAddr {
     pub decimal: u8,
     pub description: String,
     pub icon_uri: String,
+    pub is_native: Option<bool>,
 }
 
 pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenAddr>> {
@@ -159,6 +162,7 @@ pub fn load_token_data_from_file(path: &String) -> Result<HashMap<String, TokenA
                 decimal: x.decimals,
                 description: x.name.to_string(),
                 icon_uri: x.icon_uri.to_string(),
+                is_native: x.is_native.clone(),
             })
         })
         .collect();

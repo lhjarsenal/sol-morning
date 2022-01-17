@@ -1,5 +1,30 @@
 [
   {
+    "address": "",
+    "symbol": "ETH",
+    "name": "Ether",
+    "decimals": 18,
+    "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs/logo.png",
+    "isNative":true
+  },
+  {
+    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "symbol": "WETH",
+    "name": "Wrapped Ether (Wormhole)",
+    "decimals": 18,
+    "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs/logo.png",
+    "tags": [
+      "wrapped",
+      "wormhole"
+    ],
+    "extensions": {
+      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "assetContract": "https://etherscan.io/address/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "bridgeContract": "https://etherscan.io/address/0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
+      "coingeckoId": "weth"
+    }
+  },
+  {
     "address": "0x009178997aff09a67d4caccfeb897fb79d036214",
     "symbol": "1SOL",
     "name": "1sol.io Token",
@@ -75,23 +100,6 @@
       "wrapped",
       "wormhole"
     ]
-  },
-  {
-    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "symbol": "WETH",
-    "name": "Wrapped Ether (Wormhole)",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs/logo.png",
-    "tags": [
-      "wrapped",
-      "wormhole"
-    ],
-    "extensions": {
-      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "assetContract": "https://etherscan.io/address/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "bridgeContract": "https://etherscan.io/address/0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
-      "coingeckoId": "weth"
-    }
   },
   {
     "address": "0x853d955acef822db058eb8505911ed77f175b99e",
@@ -489,7 +497,6 @@
       "coingeckoId": "swipe"
     }
   },
-
   {
     "address": "0xb9F747162AB1E95d07361f9048BcDF6eDdA9eEA7",
     "symbol": "wATLAS",
