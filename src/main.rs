@@ -79,7 +79,7 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>,
         }
         Some(chain_type) => {
             if chain_type.eq("solana") {
-                token::token::eth_tokens(page, pagesize, search, address, symbol)
+                token::token::token_list(page, pagesize, search, address, symbol)
             } else if chain_type.eq("ethereum") {
                 token::token::eth_tokens(page, pagesize, search, address, symbol)
             } else {
