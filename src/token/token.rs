@@ -243,16 +243,21 @@ pub fn bridge_token_by_origin(source_chain: String, to_chain: String, origin_add
     let raw_info = fs::read_to_string(wrap_token_path).expect("Error read file");
     let vec: Vec<RawWorehole> = serde_json::from_str(&raw_info).unwrap();
 
+    let mut origin = origin_address.clone();
+    if origin_address.eq("") && source_chain.eq("ethereum") {
+        origin = String::from("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
+    }
+
     let mut wrap_address = None;
     for worehole in vec.iter() {
-        if worehole.origin_address.eq(&origin_address) {
+        if worehole.origin_address.eq(&origin) {
             wrap_address = worehole.wrap_address.get(&to_chain);
             break;
         }
     }
 
     let mut worehole_address = WoreholeAddress {
-        origin_address,
+        origin_address: origin,
         target_token: None,
     };
 
