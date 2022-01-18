@@ -38,7 +38,7 @@ use rocket_cors::{Cors, AllowedOrigins, AllowedHeaders};
 use pool::pool::PoolRequest;
 use market::pool::PoolResponse;
 use crate::response::PoolListResponse;
-use crate::rpc_client::{AssetResponse, OutApiResponse};
+use crate::rpc_client::{AssetResponse, EtherscanResp, EthFee, OutApiResponse};
 use crate::token::token::WoreholeAddress;
 
 
@@ -148,10 +148,15 @@ fn bridge_token(source_chain: String, to_chain: String,
     }
 }
 
+#[get("/eth_fee")]
+fn eth_fee() -> Json<EtherscanResp<EthFee>> {
+    Json(rpc_client::EthFee::gastracker())
+}
+
 fn main() {
     rocket::ignite()
         .mount("/", routes![index, assets, opt_swap, token_list,
-            pool_list, history, pool_info, bridge_token])
+            pool_list, history, pool_info, bridge_token,eth_fee])
         .attach(get_cors())
         .launch();
 }

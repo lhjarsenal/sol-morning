@@ -193,3 +193,36 @@ impl AccountRequest {
         res
     }
 }
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EtherscanResp<T> {
+    status: String,
+    message: String,
+    result: T,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EthFee {
+    #[serde(rename = "LastBlock")]
+    last_block: String,
+    #[serde(rename = "SafeGasPrice")]
+    safe_gas_price: String,
+    #[serde(rename = "ProposeGasPrice")]
+    propose_gas_price: String,
+    #[serde(rename = "FastGasPrice")]
+    fast_gas_price: String,
+    #[serde(rename = "suggestBaseFee")]
+    suggest_base_fee: String,
+    #[serde(rename = "gasUsedRatio")]
+    gas_used_ratio: String,
+}
+
+impl EthFee {
+    pub fn gastracker() -> EtherscanResp<EthFee> {
+        let eth_fee_url: String = String::from("https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=8AY47QX8ZP86AI5868EUS4MUW628ZJI6W9");
+        let res = reqwest::blocking::get(eth_fee_url).unwrap();
+        res.json::<EtherscanResp<EthFee>>().unwrap()
+    }
+}
+
