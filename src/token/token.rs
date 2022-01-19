@@ -38,7 +38,7 @@ pub fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<Strin
     //模糊查询symbol
     match search {
         Some(search) => {
-            let match_search = search.trim();
+            let match_search = search.to_uppercase().trim();
             vec = vec
                 .into_iter()
                 .filter(|x|
