@@ -123,13 +123,16 @@ impl OptRank {
         } else if opts.len() == 1 {
             Ok(opt_res)
         } else {
-            opt_res.push(OptRank {
-                amount_out: opts[0].amount_out + opts[1].amount_out,
-                quote_mint: self.quote_mint.to_string(),
-                base_mint: self.base_mint.to_string(),
-                slippage: self.slippage,
-                opt: opts,
-            });
+            if opts.len() <= 1 {
+                opt_res.push(OptRank {
+                    amount_out: opts[0].amount_out + opts[1].amount_out,
+                    quote_mint: self.quote_mint.to_string(),
+                    base_mint: self.base_mint.to_string(),
+                    slippage: self.slippage,
+                    opt: opts,
+                });
+            }
+
             opt_res.sort_by(|a, b| b.partial_cmp(&a).unwrap());
             Ok(opt_res)
         }
