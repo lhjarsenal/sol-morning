@@ -70,11 +70,20 @@ pub fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<Strin
         }
         None => {}
     }
-
     let start_page;
     let mut size = 50;
     let start_index;
     let total = vec.len() as u32;
+
+    if total == 0 {
+        return Json(TokenListResponse {
+            total,
+            pagesize: total,
+            page: 1,
+            data: vec![],
+        });
+    }
+
     match page {
         Some(p) => {
             start_page = p - 1;
@@ -100,7 +109,7 @@ pub fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<Strin
     let mut end_index = start_index + size;
 
     if end_index >= total {
-        end_index = total - 1;
+        end_index = total;
     }
 
     let res = vec[start_index as usize..end_index as usize].to_vec();
@@ -180,6 +189,16 @@ pub fn eth_tokens(page: Option<u32>, pagesize: Option<u32>, search: Option<Strin
     let mut size = 50;
     let start_index;
     let total = vec.len() as u32;
+
+    if total == 0 {
+        return Json(TokenListResponse {
+            total,
+            pagesize: total,
+            page: 1,
+            data: vec![],
+        });
+    }
+
     match page {
         Some(p) => {
             start_page = p - 1;
@@ -205,7 +224,7 @@ pub fn eth_tokens(page: Option<u32>, pagesize: Option<u32>, search: Option<Strin
     let mut end_index = start_index + size;
 
     if end_index >= total {
-        end_index = total - 1;
+        end_index = total;
     }
 
     let res = vec[start_index as usize..end_index as usize].to_vec();

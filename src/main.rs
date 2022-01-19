@@ -75,14 +75,18 @@ fn token_list(page: Option<u32>, pagesize: Option<u32>,
               symbol: Option<String>, chain: Option<String>) -> Json<TokenListResponse> {
     match chain {
         None => {
+            println!("none");
             token::token::token_list(page, pagesize, search, address, symbol)
         }
         Some(chain_type) => {
             if chain_type.eq("solana") {
+                println!("solana");
                 token::token::token_list(page, pagesize, search, address, symbol)
             } else if chain_type.eq("ethereum") {
+                println!("ethereum");
                 token::token::eth_tokens(page, pagesize, search, address, symbol)
             } else {
+                println!("else");
                 Json(TokenListResponse {
                     total: 0,
                     pagesize: 0,

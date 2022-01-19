@@ -483,7 +483,7 @@ pub fn pool_list(page: Option<u32>, pagesize: Option<u32>,
     let mut end_index = start_index + size;
 
     if end_index >= total {
-        end_index = total - 1;
+        end_index = total;
     }
 
     let res = vec[start_index as usize..end_index as usize].to_vec();
