@@ -237,12 +237,12 @@ fn cal_raydium(account_map: &HashMap<String, Account>,
     let quote_amount = Decimal::from(quote_info.amount);
     let base_amount = Decimal::from(base_info.amount);
 
-    let from_amount = Decimal::from_f64(amount_in * (quote_pow as f64)).unwrap();
+    let from_amount = Decimal::from_f64(amount_in * (base_pow as f64)).unwrap();
     let from_amount_with_fee = from_amount.mul(Decimal::from(pool_info.fees.swap_fee_denominator - pool_info.fees.swap_fee_numerator)).div(Decimal::from(pool_info.fees.swap_fee_denominator));
-    let denominator = quote_amount.add(from_amount_with_fee);
-    let amount_out = base_amount.mul(from_amount_with_fee).div(denominator);
-    let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
-    amount_out_format.rescale(base_token.decimal as u32);
+    let denominator = base_amount.add(from_amount_with_fee);
+    let amount_out = quote_amount.mul(from_amount_with_fee).div(denominator);
+    let mut amount_out_format = amount_out.div(Decimal::from(quote_pow));
+    amount_out_format.rescale(quote_token.decimal as u32);
 
     let matket_type = pool.market_type.get_name();
     Ok(PoolResponse {
@@ -292,7 +292,7 @@ fn cal_orca(account_map: &HashMap<String, Account>,
                                        pool_info.fees.owner_trade_fee_numerator,
                                        pool_info.fees.owner_trade_fee_denominator);
 
-    let from_amount = amount_in * (quote_pow as f64);
+    let from_amount = amount_in * (base_pow as f64);
     let from_amount_with_fee = from_amount - (from_amount * (fee_ratio as f64));
     let amount_out;
 
@@ -303,21 +303,21 @@ fn cal_orca(account_map: &HashMap<String, Account>,
             amp: amp_u64
         };
         let sc_result = sc.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
-                                             quote_info.amount as u128,
                                              base_info.amount as u128,
-                                             TradeDirection::AtoB).unwrap();
+                                             quote_info.amount as u128,
+                                             TradeDirection::BtoA).unwrap();
         amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
     } else {
         let sc = SwapCurve::default();
         let sc_result = sc.calculator.swap_without_fees(from_amount_with_fee.to_u128().unwrap(),
-                                                        quote_info.amount as u128,
                                                         base_info.amount as u128,
-                                                        TradeDirection::AtoB).unwrap();
+                                                        quote_info.amount as u128,
+                                                        TradeDirection::BtoA).unwrap();
         amount_out = Decimal::from_u128(sc_result.destination_amount_swapped).unwrap();
     }
 
-    let mut amount_out_format = amount_out.div(Decimal::from(base_pow));
-    amount_out_format.rescale(base_token.decimal as u32);
+    let mut amount_out_format = amount_out.div(Decimal::from(quote_pow));
+    amount_out_format.rescale(quote_token.decimal as u32);
 
     let matket_type = pool.market_type.get_name();
 
