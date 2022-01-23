@@ -8,7 +8,7 @@ use response::TokenListResponse;
 use serde::{Serialize, Deserialize};
 
 pub fn token_list(page: Option<u32>, pagesize: Option<u32>, search: Option<String>, address: Option<String>, symbol: Option<String>) -> Json<TokenListResponse> {
-    let token_main_path = "./token_mint.json".to_string();
+    let token_main_path = "./resource/token/solana.json".to_string();
     let raw_info = fs::read_to_string(token_main_path).expect("Error read file");
     let mut vec: Vec<RawTokenAddr> = serde_json::from_str(&raw_info).unwrap();
 
