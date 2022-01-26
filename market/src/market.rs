@@ -79,6 +79,9 @@ impl MarketOptMap {
         }
 
         for (key, value) in &self.quote_map {
+            if key.eq("So11111111111111111111111111111111111111112"){
+                continue
+            }
             let source = &self.base_map.get(key);
             match source {
                 Some(a) => {

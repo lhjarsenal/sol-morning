@@ -46,7 +46,7 @@ impl OptRequest {
 
         let mut need_raydium = true;
         let mut need_orca = true;
-        let mut need_saber = true;
+        let mut _need_saber = true;
         let mut _need_swap = true;
         let mut _need_serum = true;
         match &self.exclude {
@@ -54,7 +54,7 @@ impl OptRequest {
                 let exclude_markets = a.clone();
                 need_raydium = !exclude_markets.contains(&"raydium".to_string());
                 need_orca = !exclude_markets.contains(&"orca".to_string());
-                need_saber = !exclude_markets.contains(&"saber".to_string());
+                _need_saber = !exclude_markets.contains(&"saber".to_string());
                 _need_swap = !exclude_markets.contains(&"swap".to_string());
                 _need_serum = !exclude_markets.contains(&"serum".to_string());
             }
@@ -74,11 +74,12 @@ impl OptRequest {
             market_swap.append(&mut raydium_swap);
         }
 
-        if need_saber {
-            let saber_pool = saber::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
-            let mut saber_swap = saber_pool.filer_swap().unwrap();
-            market_swap.append(&mut saber_swap);
-        }
+        //saber支持，但前端没实现，先屏蔽
+        // if need_saber {
+        //     let saber_pool = saber::data::load_data_from_file(&self.quote_mint, &self.base_mint).expect("load orca data fail");
+        //     let mut saber_swap = saber_pool.filer_swap().unwrap();
+        //     market_swap.append(&mut saber_swap);
+        // }
 
         let mut keys: Vec<Pubkey> = vec![];
         for swap in &market_swap {
