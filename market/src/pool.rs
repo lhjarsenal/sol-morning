@@ -81,7 +81,7 @@ impl RawPool {
             let raydium_vec: Vec<raydium::data::RawPoolInfo> = serde_json::from_str(&raydium_raw).unwrap();
             for raydium in &raydium_vec {
                 vec.push(RawPool {
-                    market: "raydium".to_string(),
+                    market: "Raydium".to_string(),
                     pool_key: raydium.id.clone(),
                     quote_mint: raydium.quote_mint.clone(),
                     base_mint: raydium.base_mint.clone(),
@@ -98,7 +98,7 @@ impl RawPool {
             let orca_vec: Vec<orca::data::RawMarketPool> = serde_json::from_str(&orca_raw).unwrap();
             for orca in &orca_vec {
                 vec.push(RawPool {
-                    market: "orca".to_string(),
+                    market: "Orca".to_string(),
                     pool_key: orca.account.clone(),
                     quote_mint: orca.quote.mint.clone(),
                     base_mint: orca.base.mint.clone(),
