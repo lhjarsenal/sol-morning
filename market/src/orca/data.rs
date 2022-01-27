@@ -8,7 +8,7 @@ use rust_decimal::prelude::FromStr;
 use market::{MarketPool, MarketOptMap, MarketType};
 use crate::pool::PoolInfo;
 
-const ORCA_MARKET: &str = "orca";
+const ORCA_MARKET: &str = "Orca";
 const ORCA_PROGRAM_ID: &str = "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP";
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -9,7 +9,7 @@ use rust_decimal::prelude::FromStr;
 use market::{MarketPool, MarketOptMap, MarketType};
 use pool::PoolInfo;
 
-const RAYDIUM_MARKET: &str = "raydium";
+const RAYDIUM_MARKET: &str = "Raydium";
 const RAYDIUM_PROGRAM_ID: &str = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8";
 
 #[derive(Serialize, Deserialize, Debug)]

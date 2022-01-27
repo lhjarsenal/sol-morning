@@ -7,7 +7,7 @@ use solana_program::pubkey::Pubkey;
 use rust_decimal::prelude::FromStr;
 use market::{MarketPool, MarketOptMap, MarketType};
 
-const SABER_MARKET: &str = "saber";
+const SABER_MARKET: &str = "Saber";
 const SABER_PROGRAM_ID: &str = "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ";
 
 #[derive(Serialize, Deserialize, Debug)]
