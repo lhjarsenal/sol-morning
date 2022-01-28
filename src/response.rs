@@ -162,7 +162,7 @@ impl OptRank {
                 let from_amount = amount_in * (quote_pow as f64);
                 let mut amount_out_format;
 
-                if opt.market.eq("raydium") {
+                if opt.market.eq("Raydium") {
                     let from_amount_with_fee = from_amount * step.fee_factor;
                     let denominator = quote_amount as f64 + from_amount_with_fee;
                     let amount_out = base_amount as f64 * from_amount_with_fee / denominator;
@@ -203,7 +203,7 @@ impl OptRank {
                 let from_amount = amount_in * (base_pow as f64);
                 let mut amount_out_format;
 
-                if opt.market.eq("raydium") {
+                if opt.market.eq("Raydium") {
                     let from_amount_with_fee = from_amount * step.fee_factor;
                     let denominator = quote_amount as f64 + from_amount_with_fee;
                     let amount_out = base_amount as f64 * from_amount_with_fee / denominator;
