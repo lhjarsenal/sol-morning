@@ -151,7 +151,10 @@ impl AccountRequest {
         //遇到此资产滤掉
         let orca_farm_key = "Aquafarm".trim();
 
-        let res = reqwest::blocking::get(asset_url).unwrap();
+        let client =reqwest::blocking::Client::new();
+        let res = client.get(&asset_url)
+            .header("User-Agent","PostmanRuntime/7.29.0")
+            .header("Host","api.solscan.io").send().unwrap();
         let asset_res = res.json::<OutApiResponse<AssetResponse>>().unwrap();
 
         //加载farm-pool对应关系
